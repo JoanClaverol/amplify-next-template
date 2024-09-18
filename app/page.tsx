@@ -5,6 +5,8 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import "./../app/app.css";
 import { Amplify } from "aws-amplify";
+import { Authenticator } from "@aws-amplify/ui-react";
+import '@aws-amplify/ui-react/styles.css';
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
 
@@ -31,13 +33,27 @@ export default function App() {
     });
   }
 
+  async function deleteTodo(id: string) {
+    try {
+      await client.models.Todo.delete({ id });
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  }
+
   return (
+    <Authenticator>
+      {({ signOut, user }) => (
+
     <main>
       <h1>My todos</h1>
       <button onClick={createTodo}>+ new</button>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+          <li key={todo.id}>
+            {todo.content}
+            <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+          </li>
         ))}
       </ul>
       <div>
@@ -47,6 +63,9 @@ export default function App() {
           Review next steps of this tutorial.
         </a>
       </div>
+      <button onClick={signOut}>Sign out</button>
     </main>
+    )}
+    </Authenticator>
   );
 }
