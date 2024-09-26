@@ -9,6 +9,7 @@ import { Authenticator } from "@aws-amplify/ui-react";
 import '@aws-amplify/ui-react/styles.css';
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
+import OrderTable from "./backend/OrderTable";
 
 Amplify.configure(outputs);
 
@@ -61,6 +62,7 @@ export default function App() {
           <h1>{user?.signInDetails?.loginId} todos</h1>
           <button onClick={createTodo}>+ new</button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
+          <OrderTable />
           <ul>
             {todos.map((todo) => (
               <li key={todo.id}>
