@@ -34,7 +34,13 @@ interface ApiResponse {
   data: AdvertisingData[];
 }
 
-export default function AdvertisingComponent({ selectedCompany, isLoading }: { selectedCompany: string | null, isLoading: boolean }) {
+export default function AdvertisingComponent({
+  selectedCompany,
+  isLoading,
+}: {
+  selectedCompany: string | null;
+  isLoading: boolean;
+}) {
   const [advertisingData, setAdvertisingData] = useState<AdvertisingData[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +49,8 @@ export default function AdvertisingComponent({ selectedCompany, isLoading }: { s
       setLoading(true);
       try {
         const response = await fetch(
-          "https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/fetch-orderlines?company=" + selectedCompany
+          "https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/fetch-orderlines?company=" +
+            selectedCompany
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -62,26 +69,24 @@ export default function AdvertisingComponent({ selectedCompany, isLoading }: { s
 
   if (loading || isLoading) {
     return (
-      <Container>
+      <Box padding="l">
         <Spinner size="large" />
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container
-      header={
-        <Header variant="h1" description="Overview of all advertising campaigns">
-          Advertising Campaigns
-        </Header>
-      }
-    >
-      <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+    <Box>
+      <Header variant="h1" description="Overview of all advertising campaigns">
+        Advertising Campaigns
+      </Header>
+      <div style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Cards
           cardDefinition={{
             header: (item) => (
               <Header variant="h2">
-                {item.company} - {item.store_name_scraped} - {item.start_date} - Updated time: {new Date(item.datetime).toLocaleString()}
+                {item.company} - {item.store_name_scraped} - {item.start_date} -
+                Updated time: {new Date(item.datetime).toLocaleString()}
               </Header>
             ),
             sections: [
@@ -102,7 +107,9 @@ export default function AdvertisingComponent({ selectedCompany, isLoading }: { s
                         <div>{item.start_date}</div>
                       </SpaceBetween>
                     </Container>
-                    <Container header={<Header variant="h3">Performance</Header>}>
+                    <Container
+                      header={<Header variant="h3">Performance</Header>}
+                    >
                       <SpaceBetween size="s">
                         <div>Gross Sales: €{item.gross_sales.toFixed(2)}</div>
                         <div>Orders: {item.orders}</div>
@@ -112,8 +119,12 @@ export default function AdvertisingComponent({ selectedCompany, isLoading }: { s
                     </Container>
                     <Container header={<Header variant="h3">Budget</Header>}>
                       <SpaceBetween size="s">
-                        <div>Remaining: €{item.remaining_budget.toFixed(2)}</div>
-                        <div>Daily Avg: €{item.average_daily_budget.toFixed(2)}</div>
+                        <div>
+                          Remaining: €{item.remaining_budget.toFixed(2)}
+                        </div>
+                        <div>
+                          Daily Avg: €{item.average_daily_budget.toFixed(2)}
+                        </div>
                         <div>Total Spend: €{item.total_spend.toFixed(2)}</div>
                       </SpaceBetween>
                     </Container>
@@ -138,6 +149,6 @@ export default function AdvertisingComponent({ selectedCompany, isLoading }: { s
           visibleSections={["allInfo"]}
         />
       </div>
-    </Container>
+    </Box>
   );
 }

@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
-import * as d3 from 'd3';
-import { formatCurrency } from '../utils/formatCurrency'; // Adjust the import path as needed
-import { CurrencyCode } from '../types/currency'; // Adjust the import path as needed
+import React, { useRef, useEffect, useState } from "react";
+import * as d3 from "d3";
+import { formatCurrency } from "../utils/formatCurrency"; // Adjust the import path as needed
+import { CurrencyCode } from "../types/currency"; // Adjust the import path as needed
 
 interface HeatMapProps {
   data: {
@@ -21,17 +21,18 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
         setDimensions({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientWidth * 0.75, // Maintaining a 4:3 aspect ratio
+          width: containerWidth,
+          height: Math.max(containerWidth * 0.75, 300), // Minimum height of 300px
         });
       }
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
   }, [data, dimensions, currency]);
 
   const drawHeatmap = () => {
-    const margin = { top: 30, right: 30, bottom: 50, left: 70 };
+    const margin = { top: 30, right: 10, bottom: 50, left: 70 };
     const width = dimensions.width - margin.left - margin.right;
     const height = dimensions.height - margin.top - margin.bottom;
 
@@ -49,29 +50,38 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
     svg.selectAll("*").remove(); // Clear existing content
 
     const chart = svg
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
     const hours = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
 
-    const x = d3.scaleBand()
-      .range([0, width])
-      .domain(days)
-      .padding(0.01);
+    const x = d3.scaleBand().range([0, width]).domain(days).padding(0.01);
 
-    const y = d3.scaleBand()
+    const y = d3
+      .scaleBand()
       .range([0, height])
-      .domain(hours.map(d => d.toString()))
+      .domain(hours.map((d) => d.toString()))
       .padding(0.01);
 
-    const colorScale = d3.scaleSequential(d3.interpolateBlues)
-      .domain([0, d3.max(data, d => d.total_unique_orders) || 0]);
+    const colorScale = d3
+      .scaleSequential(d3.interpolateBlues)
+      .domain([0, d3.max(data, (d) => d.total_unique_orders) || 0]);
 
     // Create a tooltip
-    const tooltip = d3.select("body").append("div")
+    const tooltip = d3
+      .select("body")
+      .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0)
       .style("position", "absolute")
@@ -81,68 +91,85 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
       .style("border-radius", "5px")
       .style("padding", "10px");
 
-    chart.selectAll()
+    chart
+      .selectAll()
       .data(data)
       .enter()
-      .append('rect')
-      .attr('x', d => x(d.order_weekday) || 0)
-      .attr('y', d => y(d.order_hour.toString()) || 0)
-      .attr('width', x.bandwidth())
-      .attr('height', y.bandwidth())
-      .style('fill', d => colorScale(d.total_unique_orders))
+      .append("rect")
+      .attr("x", (d) => x(d.order_weekday) || 0)
+      .attr("y", (d) => y(d.order_hour.toString()) || 0)
+      .attr("width", x.bandwidth())
+      .attr("height", y.bandwidth())
+      .style("fill", (d) => colorScale(d.total_unique_orders))
       .on("mouseover", (event, d) => {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(`Day: ${d.order_weekday}<br/>Hour: ${d.order_hour}<br/>Orders: ${d.total_unique_orders}<br/>Total After Refund: ${formatCurrency(d.total_after_refund, currency)}`)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 28) + "px");
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(
+            `Day: ${d.order_weekday}<br/>Hour: ${d.order_hour}<br/>Orders: ${
+              d.total_unique_orders
+            }<br/>Total After Refund: ${formatCurrency(
+              d.total_after_refund,
+              currency
+            )}`
+          )
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 28 + "px");
       })
       .on("mouseout", () => {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+        tooltip.transition().duration(500).style("opacity", 0);
       });
 
     // X-axis
-    chart.append('g')
-      .attr('transform', `translate(0,${height})`)
+    chart
+      .append("g")
+      .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x).tickSize(0))
       .selectAll("text")
-        .style("text-anchor", "middle")
-        .attr("dy", "1em")
-        .style("font-size", "12px")
+      .style("text-anchor", "middle")
+      .attr("dy", "1em")
+      .style("font-size", "12px");
 
     // Y-axis
-    chart.append('g')
-      .call(d3.axisLeft(y).tickSize(0)
-        .tickFormat(d => {
-          const hour = parseInt(d.toString());
-          if (hour === 0) return '12AM';
-          if (hour === 12) return '12PM';
-          return (hour % 12 || 12) + (hour < 12 ? 'AM' : 'PM');
-        })
+    chart
+      .append("g")
+      .call(
+        d3
+          .axisLeft(y)
+          .tickSize(0)
+          .tickFormat((d) => {
+            const hour = parseInt(d.toString());
+            if (hour === 0) return "12AM";
+            if (hour === 12) return "12PM";
+            return (hour % 12 || 12) + (hour < 12 ? "AM" : "PM");
+          })
       )
       .selectAll("text")
-        .style("font-size", "12px")
-        .attr("dx", "-0.5em");
+      .style("font-size", "12px")
+      .attr("dx", "-0.5em");
 
     // Remove axis lines
     chart.selectAll(".domain").remove();
 
     // Add title
-    svg.append('text')
-      .attr('x', width / 2 + margin.left)
-      .attr('y', 20)
-      .attr('text-anchor', 'middle')
-      .style('font-size', '18px')
-      .style('font-weight', 'bold')
-      .text('Orders Heatmap');
+    svg
+      .append("text")
+      .attr("x", width / 2 + margin.left)
+      .attr("y", 20)
+      .attr("text-anchor", "middle")
+      .style("font-size", "18px")
+      .style("font-weight", "bold")
+      .text("Orders Heatmap");
   };
 
   return (
-    <div ref={containerRef} style={{ width: '100%' }}>
-      <svg ref={ref} style={{ width: '100%', height: '100%' }}></svg>
+    <div
+      ref={containerRef}
+      style={{ width: "100%", maxWidth: "100%", overflowX: "hidden" }}
+    >
+      <svg
+        ref={ref}
+        style={{ width: "100%", height: "100%", display: "block" }}
+      ></svg>
     </div>
   );
 };

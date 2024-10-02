@@ -2,34 +2,44 @@
 
 import { useState } from "react";
 import AdvertisingComponent from "./backend/AdvertisingComponent";
-import CompanySearchBar from "./backend/CompanySearchBar";
-import { ContentLayout, Container, Header } from "@cloudscape-design/components";
+import { ContentLayout, Header, Box } from "@cloudscape-design/components";
+import CompanySearchBar from "./components/filters/CompanySearchBar";
 
 export default function Home() {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [startDate, setStartDate] = useState<string | undefined>(undefined);
+  const [endDate, setEndDate] = useState<string | undefined>(undefined);
+
+  const handleDateRangeChange = (start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   return (
     <ContentLayout
       header={
-        <Header variant="h1" description="Search for a company to view advertising data">
+        <Header
+          variant="h1"
+          description="Search for a company and select date range to view advertising data"
+        >
           Company Advertising Dashboard
         </Header>
       }
     >
-      <Container>
+      <Box>
         <CompanySearchBar
           selectedCompany={selectedCompany}
-          isLoading={isLoading}
           onSelect={setSelectedCompany}
+          isLoading={isLoading}
         />
         {selectedCompany && (
-          <AdvertisingComponent 
-            selectedCompany={selectedCompany} 
-            isLoading={isLoading} 
+          <AdvertisingComponent
+            selectedCompany={selectedCompany}
+            isLoading={isLoading}
           />
         )}
-      </Container>
+      </Box>
     </ContentLayout>
   );
 }
