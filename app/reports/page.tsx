@@ -8,6 +8,7 @@ import Container from "@cloudscape-design/components/container";
 import Box from "@cloudscape-design/components/box";
 import Spinner from "@cloudscape-design/components/spinner";
 import { OrderChart } from "../components/OrderChart";
+import HeatMap from "../components/HeatMap";
 
 interface CurrencyData {
   value: number;
@@ -51,6 +52,7 @@ interface ApiResponse {
 const Dashboard: React.FC = () => {
   const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
   const [orderDailyData, serOrderDailyData] = useState<OrderDailyData[] | null>(null);
+  const [hourlyOrderSummary, setHourlyOrderSummary] = useState<OrderDailyData[] | null>(null);
   const [loading, setLoading] = useState(false);
   const metricToShow: 'total_unique_orders' | 'total_after_refund' = 'total_unique_orders';
 
@@ -64,6 +66,7 @@ const Dashboard: React.FC = () => {
         // console.log(data);
         setOrderSummary(data.result.order_summary);
         serOrderDailyData(data.result.daily_order_summary);
+        setHourlyOrderSummary(data.result.hourly_order_summary);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -76,13 +79,14 @@ const Dashboard: React.FC = () => {
   
   console.log(orderSummary);
   console.log(orderDailyData);
+  console.log(hourlyOrderSummary);
 
 
   if (loading) {
     return (
-      <Container>
+      <Box  padding='l' textAlign='center'>
         <Spinner size="large" />
-    </Container>
+    </Box>
     );
   }
 
@@ -111,6 +115,12 @@ const Dashboard: React.FC = () => {
       <OrderChart data={orderDailyData} metricToShow="total_after_refund"/>
     )}
       </Box>
+            <Box padding='l' textAlign='center'>
+        {hourlyOrderSummary && (
+          <HeatMap width={500} height={300} data={hourlyOrderSummary} />
+        )}
+      </Box>
+
     </Box>
     
   );
