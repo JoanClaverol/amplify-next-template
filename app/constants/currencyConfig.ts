@@ -1,4 +1,4 @@
-import { CurrencyCode, CurrencyConfig } from "../utils/currency";
+import { CurrencyCode, CurrencyConfig } from "../types/currency";
 
 export const currencyConfig: Record<CurrencyCode, CurrencyConfig> = {
     EUR: { locale: 'de-DE', currency: 'EUR' },

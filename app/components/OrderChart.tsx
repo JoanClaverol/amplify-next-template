@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import LineChart, { LineChartProps } from "@cloudscape-design/components/line-chart";
+import LineChart from "@cloudscape-design/components/line-chart";
+
 import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 
@@ -16,7 +17,7 @@ interface OrderChartProps {
 export const OrderChart: React.FC<OrderChartProps> = ({ data }) => {
   const [metricToShow, setMetricToShow] = useState<'total_unique_orders' | 'total_after_refund'>('total_unique_orders');
 
-  const series: LineChartProps.Series[] = [{
+  const series: any[] = [{
     title: metricToShow === 'total_unique_orders' ? "Total Unique Orders" : "Total After Refund",
     type: "line",
     data: data.map(item => ({
