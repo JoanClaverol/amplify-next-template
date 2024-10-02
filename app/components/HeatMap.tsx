@@ -41,7 +41,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
   }, [data, dimensions, currency]);
 
   const drawHeatmap = () => {
-    const margin = { top: 30, right: 30, bottom: 70, left: 70 };
+    const margin = { top: 30, right: 30, bottom: 50, left: 70 };
     const width = dimensions.width - margin.left - margin.right;
     const height = dimensions.height - margin.top - margin.bottom;
 
@@ -109,12 +109,9 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(x).tickSize(0))
       .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-45)")
+        .style("text-anchor", "middle")
+        .attr("dy", "1em")
         .style("font-size", "12px")
-        .style("font-weight", "bold");
 
     // Y-axis
     chart.append('g')
@@ -128,7 +125,6 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
       )
       .selectAll("text")
         .style("font-size", "12px")
-        .style("font-weight", "bold")
         .attr("dx", "-0.5em");
 
     // Remove axis lines

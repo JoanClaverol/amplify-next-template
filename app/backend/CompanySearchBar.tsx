@@ -12,7 +12,7 @@ interface CompanySearchBarProps {
 }
 
 export default function CompanySearchBar({ selectedCompany, isLoading, onSelect }: CompanySearchBarProps) {
-  const [value, setValue] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
@@ -35,25 +35,31 @@ export default function CompanySearchBar({ selectedCompany, isLoading, onSelect 
 
   useEffect(() => {
     if (selectedCompany) {
-      setValue(selectedCompany);
+      setInputValue(selectedCompany);
     }
   }, [selectedCompany]);
 
   const handleChange = ({ detail }: { detail: { value: string } }) => {
-    setValue(detail.value);
+    setInputValue(detail.value);
+  };
+
+  const handleSelect = ({ detail }: { detail: { value: string } }) => {
+    setInputValue(detail.value);
     onSelect(detail.value);
   };
 
   return (
     <Autosuggest
       onChange={handleChange}
-      value={value}
+      onSelect={handleSelect}
+      value={inputValue}
       options={companies}
       ariaLabel="Company search"
       placeholder="Search for a company"
       empty="No matches found"
       disabled={isLoading}
       statusType={isLoading ? "loading" : "finished"}
+      enteredTextLabel={(value) => `Use: "${value}"`}
     />
   );
 }
