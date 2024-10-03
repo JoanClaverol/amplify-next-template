@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { CardContent } from "../components/CardContent";
 import Grid from "@cloudscape-design/components/grid";
 import Container from "@cloudscape-design/components/container";
@@ -42,18 +42,20 @@ interface StoreData {
   CPM_pct_change: number;
 }
 
-const AdvertisingPage = () => {
+const API_URL =
+  "https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-advertising-info";
+
+const useStoreData = (selectedCompany: string | null) => {
   const [storesData, setStoresData] = useState<StoreData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchData = useCallback(async (company: string) => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(
-        `https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-advertising-info?company_name=${encodeURIComponent(
-          company
-        )}`
+        `${API_URL}?company_name=${encodeURIComponent(company)}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -61,7 +63,7 @@ const AdvertisingPage = () => {
       const data = await response.json();
       setStoresData(data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setError(error as Error);
     } finally {
       setLoading(false);
     }
@@ -73,16 +75,18 @@ const AdvertisingPage = () => {
     }
   }, [selectedCompany, fetchData]);
 
+  return { storesData, loading, error };
+};
+
+const MemoizedCardContent = React.memo(CardContent);
+
+const AdvertisingPage = () => {
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const { storesData, loading, error } = useStoreData(selectedCompany);
+
   const handleCompanySelect = (company: string) => {
     setSelectedCompany(company);
   };
-  if (loading) {
-    return (
-      <Box padding="l" textAlign="center">
-        <Spinner size="large" />
-      </Box>
-    );
-  }
 
   const renderContent = () => {
     if (!selectedCompany) {
