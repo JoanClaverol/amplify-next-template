@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { debounce } from "lodash";
 import Box from "@cloudscape-design/components/box";
 import Spinner from "@cloudscape-design/components/spinner";
 import { OrderChart } from "../components/OrderChart";
@@ -42,42 +43,10 @@ const Dashboard: React.FC = () => {
   const { width } = useWindowSize();
   const isMobile = width <= 768;
 
-  const handleDateRangeChange = (newStartDate: string, newEndDate: string) => {
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-  };
-
-  useEffect(() => {
-    if (!selectedCompany || !startDate || !endDate) return;
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to beginning of the day
-
-    if (start >= today || end >= today) {
-      setDateError("Start date and end date must be earlier than today.");
-      return;
-    }
-    if (start > end) {
-      setDateError("Start date cannot be after end date.");
-      return;
-    }
-
-    setDateError(null);
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchOrderData(selectedCompany, startDate, endDate);
-        setOrderData(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [selectedCompany, startDate, endDate]);
+  // const handleDateRangeChange = (newStartDate: string, newEndDate: string) => {
+  //   setStartDate(newStartDate);
+  //   setEndDate(newEndDate);
+  // };
 
   const renderContent = () => {
     if (dateError) {
@@ -102,6 +71,63 @@ const Dashboard: React.FC = () => {
     );
   };
 
+  const debouncedFetchData = useCallback(
+    debounce(async (company: string, start: string, end: string) => {
+      setLoading(true);
+      try {
+        const data = await fetchOrderData(company, start, end);
+        setOrderData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    if (!selectedCompany || !startDate || !endDate) return;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start >= today || end >= today) {
+      setDateError("Start date and end date must be earlier than today.");
+      return;
+    }
+    if (start > end) {
+      setDateError("Start date cannot be after end date.");
+      return;
+    }
+
+    setDateError(null);
+    debouncedFetchData(selectedCompany, startDate, endDate);
+  }, [selectedCompany, startDate, endDate, debouncedFetchData]);
+
+  const handleDateRangeChange = useCallback(
+    (newStartDate: string, newEndDate: string) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    },
+    []
+  );
+
+  const memoizedContent = useMemo(
+    () => renderContent(),
+    [
+      dateError,
+      selectedCompany,
+      startDate,
+      endDate,
+      loading,
+      orderData,
+      isMobile,
+    ]
+  );
+
   return (
     <Box>
       <Box padding="l">
@@ -115,7 +141,7 @@ const Dashboard: React.FC = () => {
         />
       </Box>
       <Box padding="l" textAlign="center">
-        {renderContent()}
+        {memoizedContent}
       </Box>
     </Box>
   );

@@ -77,7 +77,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
       rangeSelectorMode="absolute-only"
       showClearButton
       isValidRange={isValidRange}
-      relativeOptions={[]} // Add an empty array if you don't need relative options
+      relativeOptions={[]}
     />
   );
 };
