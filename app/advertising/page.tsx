@@ -7,7 +7,7 @@ import Container from "@cloudscape-design/components/container";
 import Header from "@cloudscape-design/components/header";
 import Box from "@cloudscape-design/components/box";
 import CompanySearchBar from "../components/filters/CompanySearchBar";
-import { Spinner } from "@cloudscape-design/components";
+import { Spinner, Alert } from "@cloudscape-design/components";
 
 interface StoreData {
   date_current: number;
@@ -88,6 +88,24 @@ const AdvertisingPage = () => {
     setSelectedCompany(company);
   };
 
+  const renderCardContent = (title: string, value: any, options: any = {}) => {
+    if (value === undefined || value === null) {
+      return (
+        <Alert type="warning" header={`Missing data for ${title}`}>
+          There has been a problem fetching this data.
+        </Alert>
+      );
+    }
+    return (
+      <MemoizedCardContent
+        title={title}
+        value={value}
+        {...options}
+        size="small"
+      />
+    );
+  };
+
   const renderContent = () => {
     if (!selectedCompany) {
       return <h2>Please select a company to view the advertising data</h2>;
@@ -95,6 +113,14 @@ const AdvertisingPage = () => {
 
     if (loading) {
       return <Spinner size="large" />;
+    }
+
+    if (error) {
+      return (
+        <Alert type="error" header="Error fetching data">
+          {error.message}
+        </Alert>
+      );
     }
 
     if (storesData.length === 0) {
