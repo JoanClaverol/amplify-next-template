@@ -3,8 +3,12 @@
 import { useState, useEffect } from "react";
 import { Amplify } from "aws-amplify";
 import { Authenticator } from "@aws-amplify/ui-react";
-import '@aws-amplify/ui-react/styles.css';
-import { TopNavigation, AppLayout, SideNavigation } from "@cloudscape-design/components";
+import "@aws-amplify/ui-react/styles.css";
+import {
+  TopNavigation,
+  AppLayout,
+  SideNavigation,
+} from "@cloudscape-design/components";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import outputs from "@/amplify_outputs.json";
 
@@ -13,7 +17,7 @@ Amplify.configure(outputs);
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const [user, setUser] = useState<any>(null);
   const [navigationOpen, setNavigationOpen] = useState(true);
@@ -39,12 +43,12 @@ export default function RootLayout({
             navigation={
               <SideNavigation
                 header={{
-                  href: '/',
-                  text: 'ThinkPaladar'
+                  href: "/",
+                  text: "",
                 }}
                 items={[
-                  { type: 'link', text: 'Ads', href: '/' },
-                  { type: 'link', text: 'Reports', href: '/reports' }
+                  { type: "link", text: "Advertising", href: "/advertising" },
+                  { type: "link", text: "Reports", href: "/reports" },
                 ]}
               />
             }
@@ -53,22 +57,20 @@ export default function RootLayout({
             content={
               <>
                 <TopNavigation
-                  identity={{ href: "#", title: "ThinkPaladar" }}
+                  identity={{
+                    href: "#",
+                    title: "ThinkPaladar",
+                  }}
                   utilities={[
                     {
-                      type: "button",
-                      iconName: "star",
-                      title: "Dark mode",
-                    },
-                    {
                       type: "menu-dropdown",
-                      description: user?.signInDetails?.loginId || "Customer Email",
+                      text: user?.signInDetails?.loginId || "Customer Email",
+                      description:
+                        user?.signInDetails?.loginId || "Customer Email",
                       iconName: "user-profile",
                       onItemClick: handleClick,
-                      items: [
-                        { id: "signout", text: "Sign out" }
-                      ]
-                    }
+                      items: [{ id: "signout", text: "Sign out" }],
+                    },
                   ]}
                 />
                 {children}

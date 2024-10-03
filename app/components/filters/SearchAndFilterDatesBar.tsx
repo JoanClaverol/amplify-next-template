@@ -1,4 +1,3 @@
-// components/SearchAndFilterBar.tsx
 "use client";
 
 import React from "react";
@@ -6,7 +5,7 @@ import { Grid } from "@cloudscape-design/components";
 import CompanySearchBar from "./CompanySearchBar";
 import DateRangeSelector from "./DateRangePicker";
 
-interface SearchAndFilterBarProps {
+interface SearchAndFilterDateRangeBarProps {
   selectedCompany: string | null;
   isLoading: boolean;
   onSelectCompany: (company: string | null) => void;
@@ -15,7 +14,9 @@ interface SearchAndFilterBarProps {
   onDateRangeChange: (startDate: string, endDate: string) => void;
 }
 
-const SearchAndFilterBar: React.FC<SearchAndFilterBarProps> = ({
+const SearchAndFilterDateRangeBar: React.FC<
+  SearchAndFilterDateRangeBarProps
+> = ({
   selectedCompany,
   isLoading,
   onSelectCompany,
@@ -48,4 +49,4 @@ const SearchAndFilterBar: React.FC<SearchAndFilterBarProps> = ({
   );
 };
 
-export default SearchAndFilterBar;
+export default SearchAndFilterDateRangeBar;

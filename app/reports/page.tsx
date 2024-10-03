@@ -43,11 +43,6 @@ const Dashboard: React.FC = () => {
   const { width } = useWindowSize();
   const isMobile = width <= 768;
 
-  // const handleDateRangeChange = (newStartDate: string, newEndDate: string) => {
-  //   setStartDate(newStartDate);
-  //   setEndDate(newEndDate);
-  // };
-
   const renderContent = () => {
     if (dateError) {
       return <h2>{dateError}</h2>;
