@@ -3,13 +3,15 @@ import * as d3 from "d3";
 import { formatCurrency } from "../utils/formatCurrency"; // Adjust the import path as needed
 import { CurrencyCode } from "../types/currency"; // Adjust the import path as needed
 
+interface DataPoint {
+  order_weekday: string;
+  order_hour: number;
+  total_unique_orders: number;
+  total_after_refund: number;
+}
+
 interface HeatMapProps {
-  data: {
-    order_weekday: string;
-    order_hour: number;
-    total_unique_orders: number;
-    total_after_refund: number;
-  }[];
+  data: DataPoint[];
   currency: CurrencyCode;
 }
 
@@ -17,6 +19,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
   const ref = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [aggregatedData, setAggregatedData] = useState<DataPoint[]>([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -36,10 +39,42 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
   }, []);
 
   useEffect(() => {
-    if (data && ref.current && dimensions.width > 0 && dimensions.height > 0) {
+    // Aggregate data
+    const aggregated = d3.rollup(
+      data,
+      (v) => ({
+        total_unique_orders: d3.mean(v, (d) => d.total_unique_orders) || 0,
+        total_after_refund: d3.mean(v, (d) => d.total_after_refund) || 0,
+      }),
+      (d) => d.order_weekday,
+      (d) => d.order_hour
+    );
+
+    const newAggregatedData: DataPoint[] = [];
+    aggregated.forEach((hourMap, weekday) => {
+      hourMap.forEach((values, hour) => {
+        newAggregatedData.push({
+          order_weekday: weekday,
+          order_hour: +hour,
+          total_unique_orders: values.total_unique_orders,
+          total_after_refund: values.total_after_refund,
+        });
+      });
+    });
+
+    setAggregatedData(newAggregatedData);
+  }, [data]);
+
+  useEffect(() => {
+    if (
+      aggregatedData.length > 0 &&
+      ref.current &&
+      dimensions.width > 0 &&
+      dimensions.height > 0
+    ) {
       drawHeatmap();
     }
-  }, [data, dimensions, currency]);
+  }, [aggregatedData, dimensions, currency]);
 
   const drawHeatmap = () => {
     const margin = { top: 30, right: 10, bottom: 50, left: 70 };
@@ -64,7 +99,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
       "Saturday",
       "Sunday",
     ];
-    const hours = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
+    const hours = Array.from({ length: 24 }, (_, i) => i + 1); // 1 to 24
 
     const x = d3.scaleBand().range([0, width]).domain(days).padding(0.01);
 
@@ -76,7 +111,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
 
     const colorScale = d3
       .scaleSequential(d3.interpolateBlues)
-      .domain([0, d3.max(data, (d) => d.total_unique_orders) || 0]);
+      .domain([0, d3.max(aggregatedData, (d) => d.total_unique_orders) || 0]);
 
     // Create a tooltip
     const tooltip = d3
@@ -93,7 +128,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
 
     chart
       .selectAll()
-      .data(data)
+      .data(aggregatedData)
       .enter()
       .append("rect")
       .attr("x", (d) => x(d.order_weekday) || 0)
@@ -105,9 +140,11 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
-            `Day: ${d.order_weekday}<br/>Hour: ${d.order_hour}<br/>Orders: ${
-              d.total_unique_orders
-            }<br/>Total After Refund: ${formatCurrency(
+            `Day: ${d.order_weekday}<br/>Hour: ${
+              d.order_hour
+            }<br/>Average Orders on the given period: ${d.total_unique_orders.toFixed(
+              0
+            )}<br/>Average Total After Refund on the given period: ${formatCurrency(
               d.total_after_refund,
               currency
             )}`
