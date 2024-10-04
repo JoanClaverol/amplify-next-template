@@ -20,7 +20,7 @@ export const CardContent: React.FC<CardContentProps> = ({
   size = "medium",
 }) => {
   const formattedValue = formatAsPercentage
-    ? `${(Number(value) * 100).toFixed(2)}%`
+    ? `${(Number(value) * 100).toFixed(0)}%`
     : currency
     ? formatCurrency(Number(value), currency)
     : value;
