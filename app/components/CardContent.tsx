@@ -9,6 +9,7 @@ interface CardContentProps {
   formatAsPercentage?: boolean;
   changeIndicator?: boolean;
   size?: "small" | "medium" | "large";
+  color?: BoxProps.Color;
 }
 
 export const CardContent: React.FC<CardContentProps> = ({
@@ -18,6 +19,7 @@ export const CardContent: React.FC<CardContentProps> = ({
   formatAsPercentage,
   changeIndicator,
   size = "medium",
+  color, // Add this line
 }) => {
   const formattedValue = formatAsPercentage
     ? `${(Number(value) * 100).toFixed(0)}%`
@@ -31,6 +33,10 @@ export const CardContent: React.FC<CardContentProps> = ({
     return "inherit";
   };
 
+  // Determine the color to use
+  const finalColor =
+    color || (changeIndicator ? getChangeColor(Number(value)) : undefined);
+
   return (
     <Box padding="xs" textAlign="left">
       <Box
@@ -42,7 +48,7 @@ export const CardContent: React.FC<CardContentProps> = ({
       <Box
         variant="awsui-value-large"
         fontSize={size === "small" ? "heading-s" : "heading-m"}
-        color={changeIndicator ? getChangeColor(Number(value)) : undefined}
+        color={finalColor} // Use finalColor here
       >
         {changeIndicator &&
           (Number(value) > 0 ? "↑" : Number(value) < 0 ? "↓" : "")}

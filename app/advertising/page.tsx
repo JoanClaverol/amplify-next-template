@@ -1,110 +1,59 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { CardContent } from "../components/CardContent";
-import Grid from "@cloudscape-design/components/grid";
-import Container from "@cloudscape-design/components/container";
-import Header from "@cloudscape-design/components/header";
+import React, { useState, useMemo } from "react";
+import { Spinner, Alert, Grid, Button } from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
+import { useStoreData } from "../hooks/useAdvertisingData";
 import CompanySearchBar from "../components/filters/CompanySearchBar";
-import { Spinner, Alert } from "@cloudscape-design/components";
-
-interface StoreData {
-  date_current: number;
-  store_name_scraped: string;
-  start_date: string;
-  status_current: string;
-  company: string;
-  gross_sales_current: number;
-  orders_current: number;
-  clicks_current: number;
-  impressions_current: number;
-  remaining_budget_current: number;
-  average_daily_budget_current: number;
-  total_spend_current: number;
-  CR_GMO_current: number;
-  factuacion_gmo_current: number;
-  ROAS_current: number;
-  CPO_current: number;
-  CPC_current: number;
-  CPM_current: number;
-  daily_budget_current: number;
-  gross_sales_pct_change: number;
-  orders_pct_change: number;
-  clicks_pct_change: number;
-  impressions_pct_change: number;
-  remaining_budget_pct_change: number;
-  total_spend_pct_change: number;
-  CR_GMO_pct_change: number;
-  factuacion_gmo_pct_change: number;
-  ROAS_pct_change: number;
-  CPC_pct_change: number;
-  CPM_pct_change: number;
-}
-
-const API_URL =
-  "https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-advertising-info";
-
-const useStoreData = (selectedCompany: string | null) => {
-  const [storesData, setStoresData] = useState<StoreData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchData = useCallback(async (company: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        `${API_URL}?company_name=${encodeURIComponent(company)}`
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setStoresData(data);
-    } catch (error) {
-      setError(error as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedCompany) {
-      fetchData(selectedCompany);
-    }
-  }, [selectedCompany, fetchData]);
-
-  return { storesData, loading, error };
-};
-
-const MemoizedCardContent = React.memo(CardContent);
+import StoreFilter from "../components/filters/StoreFilter";
+import AdvertisingCampaignFilter from "../components/filters/AdvertisingCampaignFilter";
+import AdvertisingSummary from "./AdvertisingSummary";
 
 const AdvertisingPage = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
-  const { storesData, loading, error } = useStoreData(selectedCompany);
+  const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const [selectedStartDate, setSelectedStartDate] = useState<string | null>(
+    null
+  );
+  const { storesData, loading, error } = useStoreData(
+    selectedCompany,
+    selectedStore,
+    selectedStartDate
+  );
+
+  const handleStoreSelect = (store: string | null) => {
+    setSelectedStore(store);
+    if (!store) {
+      setSelectedStartDate(null);
+    }
+  };
+
+  const handleStartDateSelect = (startDate: string) => {
+    setSelectedStartDate(startDate);
+  };
 
   const handleCompanySelect = (company: string) => {
     setSelectedCompany(company);
   };
 
-  const renderCardContent = (title: string, value: any, options: any = {}) => {
-    if (value === undefined || value === null) {
-      return (
-        <Alert type="warning" header={`Missing data for ${title}`}>
-          There has been a problem fetching this data.
-        </Alert>
-      );
-    }
-    return (
-      <MemoizedCardContent
-        title={title}
-        value={value}
-        {...options}
-        size="small"
-      />
-    );
+  const handleClearStoreSelection = () => {
+    setSelectedStore(null);
+    setSelectedStartDate(null);
   };
+
+  const storeOptions = useMemo(() => {
+    const uniqueStores = Array.from(
+      new Set(storesData.map((store) => store.store_name_scraped))
+    );
+    return uniqueStores.map((store) => ({ label: store, value: store }));
+  }, [storesData]);
+
+  const startDateOptions = useMemo(() => {
+    const uniqueStartDates = Array.from(
+      new Set(storesData.map((store) => store.start_date))
+    );
+    return uniqueStartDates.map((date) => ({ label: date, value: date }));
+  }, [storesData]);
 
   const renderContent = () => {
     if (!selectedCompany) {
@@ -124,205 +73,36 @@ const AdvertisingPage = () => {
     }
 
     if (storesData.length === 0) {
-      return <h2>No data available for the selected company</h2>;
+      return <h2>No data available for the selected filters</h2>;
     }
 
     return (
-      <>
-        {storesData.map((store, index) => (
-          <Container key={index} fitHeight={true}>
-            <Box padding="l" variant="awsui-key-label">
-              <Header
-                variant="h2"
-                description={new Date(store.date_current).toLocaleDateString()}
-              >
-                {store.store_name_scraped}
-              </Header>
+      <Grid
+        gridDefinition={[
+          { colspan: { default: 12, xxs: selectedStore ? 4 : 0 } }, // Store filter
+          { colspan: { default: 12, xxs: selectedStore ? 4 : 0 } }, // Campaign filter (conditionally rendered)
+          { colspan: { default: 12, xxs: 4 } }, // Clear Store Selection button
+        ]}
+      >
+        <StoreFilter
+          selectedStore={selectedStore}
+          storeOptions={storeOptions}
+          handleStoreSelect={handleStoreSelect}
+        />
 
-              <Grid gridDefinition={[{ colspan: 3 }, { colspan: 9 }]}>
-                <Box padding="s">
-                  <Header variant="h3">Store Information</Header>
-                  <CardContent
-                    title="Company"
-                    value={store.company}
-                    size="small"
-                  />
-                  <CardContent
-                    title="Start Date"
-                    value={store.start_date}
-                    size="small"
-                  />
-                  <CardContent
-                    title="Status"
-                    value={store.status_current}
-                    size="small"
-                  />
+        {/* Conditionally render the AdvertisingCampaignFilter only when a store is selected */}
+        {selectedStore && (
+          <AdvertisingCampaignFilter
+            selectedStartDate={selectedStartDate}
+            startDateOptions={startDateOptions}
+            handleStartDateSelect={handleStartDateSelect}
+          />
+        )}
 
-                  <Box padding={{ top: "l" }}>
-                    <Header variant="h3">Budget</Header>
-                    <CardContent
-                      title="Remaining Budget"
-                      value={store.remaining_budget_current}
-                      currency="EUR"
-                      size="small"
-                    />
-                    <CardContent
-                      title="Average Daily Budget"
-                      value={store.average_daily_budget_current}
-                      currency="EUR"
-                      size="small"
-                    />
-                    <CardContent
-                      title="Total Spend"
-                      value={store.total_spend_current}
-                      currency="EUR"
-                      size="small"
-                    />
-                  </Box>
-                </Box>
-
-                <Box padding="s">
-                  <Header variant="h3">Performance Metrics</Header>
-                  <Grid gridDefinition={[{ colspan: 6 }, { colspan: 6 }]}>
-                    <Box>
-                      <Header variant="h3">Current Values</Header>
-                      <Grid gridDefinition={[{ colspan: 6 }, { colspan: 6 }]}>
-                        <Box>
-                          <CardContent
-                            title="Gross Sales"
-                            value={store.gross_sales_current}
-                            currency="EUR"
-                            size="small"
-                          />
-                          <CardContent
-                            title="Orders"
-                            value={store.orders_current}
-                            size="small"
-                          />
-                          <CardContent
-                            title="Clicks"
-                            value={store.clicks_current}
-                            size="small"
-                          />
-                          <CardContent
-                            title="Impressions"
-                            value={store.impressions_current}
-                            size="small"
-                          />
-                          <CardContent
-                            title="CR GMO"
-                            value={store.CR_GMO_current}
-                            formatAsPercentage
-                            size="small"
-                          />
-                        </Box>
-                        <Box>
-                          <CardContent
-                            title="ROAS"
-                            value={store.ROAS_current}
-                            size="small"
-                          />
-                          <CardContent
-                            title="CPO"
-                            value={store.CPO_current}
-                            currency="EUR"
-                            size="small"
-                          />
-                          <CardContent
-                            title="CPC"
-                            value={store.CPC_current}
-                            currency="EUR"
-                            size="small"
-                          />
-                          <CardContent
-                            title="CPM"
-                            value={store.CPM_current}
-                            currency="EUR"
-                            size="small"
-                          />
-                        </Box>
-                      </Grid>
-                    </Box>
-
-                    <Box>
-                      <Header variant="h3">7-Day Changes</Header>
-                      <Grid gridDefinition={[{ colspan: 6 }, { colspan: 6 }]}>
-                        <Box>
-                          <CardContent
-                            title="Gross Sales"
-                            value={store.gross_sales_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="Orders"
-                            value={store.orders_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="Clicks"
-                            value={store.clicks_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="Impressions"
-                            value={store.impressions_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="CR GMO"
-                            value={store.CR_GMO_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                        </Box>
-                        <Box>
-                          <CardContent
-                            title="ROAS"
-                            value={store.ROAS_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="Total Spend"
-                            value={store.total_spend_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="CPC"
-                            value={store.CPC_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                          <CardContent
-                            title="CPM"
-                            value={store.CPM_pct_change}
-                            formatAsPercentage
-                            changeIndicator
-                            size="small"
-                          />
-                        </Box>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                </Box>
-              </Grid>
-            </Box>
-          </Container>
-        ))}
-      </>
+        <Button onClick={handleClearStoreSelection} disabled={!selectedStore}>
+          Clear Store Selection
+        </Button>
+      </Grid>
     );
   };
 
@@ -335,9 +115,19 @@ const AdvertisingPage = () => {
           onSelect={handleCompanySelect}
         />
       </Box>
+
       <Box padding="l" textAlign="center">
         {renderContent()}
       </Box>
+
+      {selectedStore && selectedStartDate && (
+        <Box padding="l" textAlign="center">
+          <AdvertisingSummary
+            storesData={storesData}
+            selectedStore={selectedStore}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
