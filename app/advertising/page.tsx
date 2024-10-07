@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Spinner, Alert, Grid, Button } from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
 import { useStoreData } from "../hooks/useAdvertisingData";
@@ -15,12 +15,15 @@ const AdvertisingPage = () => {
   const [selectedStartDate, setSelectedStartDate] = useState<string | null>(
     null
   );
+
+  // Use custom hook to fetch data based on selected filters
   const { storesData, loading, error } = useStoreData(
     selectedCompany,
     selectedStore,
     selectedStartDate
   );
 
+  // Handlers for store and date selection
   const handleStoreSelect = (store: string | null) => {
     setSelectedStore(store);
     if (!store) {
@@ -34,6 +37,8 @@ const AdvertisingPage = () => {
 
   const handleCompanySelect = (company: string) => {
     setSelectedCompany(company);
+    setSelectedStore(null);
+    setSelectedStartDate(null);
   };
 
   const handleClearStoreSelection = () => {
@@ -41,70 +46,19 @@ const AdvertisingPage = () => {
     setSelectedStartDate(null);
   };
 
-  const storeOptions = useMemo(() => {
-    const uniqueStores = Array.from(
-      new Set(storesData.map((store) => store.store_name_scraped))
-    );
-    return uniqueStores.map((store) => ({ label: store, value: store }));
-  }, [storesData]);
+  const storeOptions = Array.from(
+    new Set(storesData.map((store) => store.store_name_scraped))
+  ).map((storeName) => ({
+    label: storeName,
+    value: storeName,
+  }));
 
-  const startDateOptions = useMemo(() => {
-    const uniqueStartDates = Array.from(
-      new Set(storesData.map((store) => store.start_date))
-    );
-    return uniqueStartDates.map((date) => ({ label: date, value: date }));
-  }, [storesData]);
-
-  const renderContent = () => {
-    if (!selectedCompany) {
-      return <h2>Please select a company to view the advertising data</h2>;
-    }
-
-    if (loading) {
-      return <Spinner size="large" />;
-    }
-
-    if (error) {
-      return (
-        <Alert type="error" header="Error fetching data">
-          {error.message}
-        </Alert>
-      );
-    }
-
-    if (storesData.length === 0) {
-      return <h2>No data available for the selected filters</h2>;
-    }
-
-    return (
-      <Grid
-        gridDefinition={[
-          { colspan: { default: 12, xxs: selectedStore ? 4 : 0 } }, // Store filter
-          { colspan: { default: 12, xxs: selectedStore ? 4 : 0 } }, // Campaign filter (conditionally rendered)
-          { colspan: { default: 12, xxs: 4 } }, // Clear Store Selection button
-        ]}
-      >
-        <StoreFilter
-          selectedStore={selectedStore}
-          storeOptions={storeOptions}
-          handleStoreSelect={handleStoreSelect}
-        />
-
-        {/* Conditionally render the AdvertisingCampaignFilter only when a store is selected */}
-        {selectedStore && (
-          <AdvertisingCampaignFilter
-            selectedStartDate={selectedStartDate}
-            startDateOptions={startDateOptions}
-            handleStartDateSelect={handleStartDateSelect}
-          />
-        )}
-
-        <Button onClick={handleClearStoreSelection} disabled={!selectedStore}>
-          Clear Store Selection
-        </Button>
-      </Grid>
-    );
-  };
+  const startDateOptions = Array.from(
+    new Set(storesData.map((store) => store.start_date))
+  ).map((startDate) => ({
+    label: startDate,
+    value: startDate,
+  }));
 
   return (
     <Box>
@@ -117,7 +71,44 @@ const AdvertisingPage = () => {
       </Box>
 
       <Box padding="l" textAlign="center">
-        {renderContent()}
+        {!selectedCompany && (
+          <h2>Please select a company to view the advertising data</h2>
+        )}
+        {loading && <Spinner size="large" />}
+        {error && (
+          <Alert type="error" header="Error fetching data">
+            {error.message}
+          </Alert>
+        )}
+        {selectedCompany && !loading && !error && storesData.length === 0 && (
+          <h2>No data available for the selected filters</h2>
+        )}
+        {selectedCompany && !loading && !error && storesData.length > 0 && (
+          <Grid
+            gridDefinition={[
+              { colspan: { default: 12, xxs: 4 } }, // Store filter
+              { colspan: { default: 12, xxs: 4 } }, // Campaign filter
+              { colspan: { default: 12, xxs: 4 } }, // Clear Store Selection button
+            ]}
+          >
+            <StoreFilter
+              selectedStore={selectedStore}
+              storeOptions={storeOptions}
+              handleStoreSelect={handleStoreSelect}
+            />
+            <AdvertisingCampaignFilter
+              selectedStartDate={selectedStartDate}
+              startDateOptions={startDateOptions}
+              handleStartDateSelect={handleStartDateSelect}
+            />
+            <Button
+              onClick={handleClearStoreSelection}
+              disabled={!selectedStore}
+            >
+              Clear Store Selection
+            </Button>
+          </Grid>
+        )}
       </Box>
 
       {selectedStore && selectedStartDate && (

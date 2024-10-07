@@ -10,6 +10,7 @@ interface CardContentProps {
   changeIndicator?: boolean;
   size?: "small" | "medium" | "large";
   color?: BoxProps.Color;
+  isBold?: boolean; // New prop to control boldness
 }
 
 export const CardContent: React.FC<CardContentProps> = ({
@@ -19,7 +20,8 @@ export const CardContent: React.FC<CardContentProps> = ({
   formatAsPercentage,
   changeIndicator,
   size = "medium",
-  color, // Add this line
+  color,
+  isBold = false, // Default to false (not bold)
 }) => {
   const formattedValue = formatAsPercentage
     ? `${(Number(value) * 100).toFixed(0)}%`
@@ -49,6 +51,7 @@ export const CardContent: React.FC<CardContentProps> = ({
         variant="awsui-value-large"
         fontSize={size === "small" ? "heading-s" : "heading-m"}
         color={finalColor} // Use finalColor here
+        fontWeight={isBold ? "bold" : "normal"} // Apply bold if isBold is true
       >
         {changeIndicator &&
           (Number(value) > 0 ? "↑" : Number(value) < 0 ? "↓" : "")}

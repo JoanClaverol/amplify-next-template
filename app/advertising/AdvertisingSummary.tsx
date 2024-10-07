@@ -1,9 +1,10 @@
+// AdvertisingSummary.tsx
 import React, { useMemo } from "react";
 import { CardContent } from "../components/CardContent";
 import Box from "@cloudscape-design/components/box";
 import { StoreData } from "../types/advertisingTypes";
 import { Header } from "@cloudscape-design/components";
-import { CurrencyCode } from "../types/currency";
+import CardMetric from "./CardMetric"; // Import the CardMetric
 
 interface AdvertisingSummaryProps {
   storesData: StoreData[];
@@ -35,138 +36,125 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
   if (!closestDateStoreData) {
     return <p>No data available for the selected store</p>;
   }
-
-  const renderMetric = (
-    title: string,
-    value: any,
-    pctChange: any,
-    currency?: string,
-    color?: string
-  ) => (
-    <Box>
-      <CardContent
-        title={title}
-        value={
-          value !== undefined
-            ? currency
-              ? Number(value)
-              : value.toString()
-            : "N/A"
-        }
-        currency={currency as CurrencyCode}
-        size="large"
-        color={color as any}
-      />
-      <CardContent
-        title={`${title} % Change`}
-        value={pctChange !== undefined ? pctChange : "N/A"}
-        formatAsPercentage
-        size="small"
-        changeIndicator
-      />
-    </Box>
-  );
+  const metrics = [
+    {
+      title: "Average daily budget",
+      value: closestDateStoreData.average_daily_budget || "N/A",
+      type: "currency",
+    },
+    {
+      title: "Orders",
+      value: closestDateStoreData.orders_diff,
+      pctChange: closestDateStoreData.orders_pct_change,
+    },
+    {
+      title: "Gross Sales",
+      value: closestDateStoreData.gross_sales_diff,
+      pctChange: closestDateStoreData.gross_sales_pct_change,
+    },
+    {
+      title: "Remaining Budget",
+      value: closestDateStoreData.remaining_budget_diff,
+      pctChange: closestDateStoreData.remaining_budget_pct_change,
+    },
+    {
+      title: "Impressions",
+      value: closestDateStoreData.impressions_diff,
+      pctChange: closestDateStoreData.impressions_pct_change,
+    },
+    {
+      title: "Clicks",
+      value: closestDateStoreData.clicks_diff,
+      pctChange: closestDateStoreData.clicks_pct_change,
+    },
+    {
+      title: "Total Spend",
+      value: closestDateStoreData.total_spend_diff,
+      pctChange: closestDateStoreData.total_spend_pct_change,
+    },
+    {
+      title: "CR GMO",
+      value: closestDateStoreData.CR_GMO?.toFixed(1),
+      pctChange: closestDateStoreData.CR_GMO_pct_change,
+    },
+    {
+      title: "Facturacion GMO",
+      value: closestDateStoreData.facturacion_gmo?.toFixed(1),
+      pctChange: closestDateStoreData.facturacion_gmo_pct_change,
+    },
+    {
+      title: "ROAS",
+      value: closestDateStoreData.ROAS?.toFixed(1),
+      pctChange: closestDateStoreData.ROAS_pct_change,
+    },
+    {
+      title: "CPC",
+      value: closestDateStoreData.CPC?.toFixed(1),
+      pctChange: closestDateStoreData.CPC_pct_change,
+    },
+    {
+      title: "CPM",
+      value: closestDateStoreData.CPM?.toFixed(1),
+      pctChange: closestDateStoreData.CPM_pct_change,
+    },
+    {
+      title: "Pedidos GMO",
+      value: closestDateStoreData.pedidos_gmo?.toFixed(1),
+      pctChange: closestDateStoreData.pedidos_gmo_pct_change,
+    },
+  ];
 
   return (
-    <>
-      <Box>
-        <Header
-          variant="h1"
-          description={`Campaign: ${closestDateStoreData.start_date || "N/A"}`}
-          info={
-            <Box fontSize="body-s">
-              Status:{" "}
-              {closestDateStoreData.status
-                ? closestDateStoreData.status.join(", ")
-                : "N/A"}
-            </Box>
-          }
-        >
-          {closestDateStoreData.store_name_scraped || "Unknown Store"}
-        </Header>
-        <Box fontSize="body-m" fontWeight="bold" padding={{ top: "xs" }}>
-          Analyzed Data from{" "}
-          {new Date(closestDateStoreData.date).toDateString()}
-        </Box>
+    <Box margin={{ bottom: "l" }}>
+      <Header
+        variant="h1"
+        info={
+          <Box fontSize="heading-m">
+            Status:{" "}
+            {closestDateStoreData.status
+              ? closestDateStoreData.status.join(", ")
+              : "N/A"}
+            <br />
+            {`Campaign: ${closestDateStoreData.start_date || "N/A"}`}
+          </Box>
+        }
+      >
+        {closestDateStoreData.store_name_scraped || "Unknown Store"}
+      </Header>
+      <Box
+        fontSize="heading-m"
+        fontWeight="bold"
+        padding={{ top: "xs", bottom: "s" }}
+      >
+        Analyzed Data from {new Date(closestDateStoreData.date).toDateString()}
       </Box>
-      <Box display="block">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "nowrap",
-            overflowX: "auto",
-          }}
-        >
-          {renderMetric(
-            "Impressions",
-            closestDateStoreData.impressions_diff,
-            closestDateStoreData.impressions_pct_change
-          )}
-          {renderMetric(
-            "Clicks",
-            closestDateStoreData.clicks_diff,
-            closestDateStoreData.clicks_pct_change
-          )}
-          {renderMetric(
-            "Orders",
-            closestDateStoreData.orders_diff,
-            closestDateStoreData.orders_pct_change
-          )}
-          {renderMetric(
-            "Gross Sales",
-            closestDateStoreData.gross_sales_diff,
-            closestDateStoreData.gross_sales_pct_change
-          )}
-          {renderMetric(
-            "Remaining Budget",
-            closestDateStoreData.remaining_budget,
-            closestDateStoreData.remaining_budget_pct_change
-          )}
-          <CardContent
-            title="Average daily budget"
-            value={closestDateStoreData.average_daily_budget || "N/A"}
-            size="small"
-          />
-          {renderMetric(
-            "Total Spend",
-            closestDateStoreData.total_spend_diff,
-            closestDateStoreData.total_spend_pct_change
-          )}
-          {renderMetric(
-            "CR_GMO",
-            closestDateStoreData.CR_GMO?.toFixed(1),
-            closestDateStoreData.CR_GMO_pct_change
-          )}
-          {renderMetric(
-            "Facturacion_GMO",
-            closestDateStoreData.facturacion_gmo,
-            closestDateStoreData.facturacion_gmo_pct_change
-          )}
-          {renderMetric(
-            "ROAS",
-            closestDateStoreData.ROAS?.toFixed(1),
-            closestDateStoreData.ROAS_pct_change
-          )}
-          {renderMetric(
-            "CPC",
-            closestDateStoreData.CPC?.toFixed(1),
-            closestDateStoreData.CPC_pct_change
-          )}
-          {renderMetric(
-            "CPM",
-            closestDateStoreData.CPM?.toFixed(1),
-            closestDateStoreData.CPM_pct_change
-          )}
-          {renderMetric(
-            "Pedidos_GMO",
-            closestDateStoreData.pedidos_gmo?.toFixed(1),
-            closestDateStoreData.pedidos_gmo_pct_change
-          )}
-        </div>
-      </Box>
-    </>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+          gap: "1rem",
+          justifyContent: "start",
+        }}
+      >
+        {metrics.map((metric, index) => (
+          <div key={index}>
+            {metric.type === "currency" ? (
+              <CardMetric
+                title={metric.title}
+                value={metric.value}
+                pctChange={null}
+              />
+            ) : (
+              <CardMetric
+                title={metric.title}
+                value={metric.value}
+                pctChange={metric.pctChange}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </Box>
   );
 };
-
 export default AdvertisingSummary;
