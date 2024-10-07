@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Spinner, Alert, Grid, Button } from "@cloudscape-design/components";
+import {
+  Spinner,
+  Alert,
+  Grid,
+  Button,
+  Header,
+} from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
 import { useStoreData } from "../hooks/useAdvertisingData";
 import CompanySearchBar from "../components/filters/CompanySearchBar";
@@ -64,6 +70,7 @@ const AdvertisingPage = () => {
   return (
     <Box>
       <Box padding="l">
+        <Header variant="h1">Advertising</Header>
         <CompanySearchBar
           selectedCompany={selectedCompany}
           isLoading={loading}

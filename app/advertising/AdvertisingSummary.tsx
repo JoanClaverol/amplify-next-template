@@ -43,9 +43,9 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
       type: "currency",
     },
     {
-      title: "Orders",
-      value: closestDateStoreData.orders_diff,
-      pctChange: closestDateStoreData.orders_pct_change,
+      title: "Remaining Budget",
+      value: closestDateStoreData.remaining_budget,
+      pctChange: closestDateStoreData.remaining_budget_pct_change,
     },
     {
       title: "Gross Sales",
@@ -53,9 +53,9 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
       pctChange: closestDateStoreData.gross_sales_pct_change,
     },
     {
-      title: "Remaining Budget",
-      value: closestDateStoreData.remaining_budget_diff,
-      pctChange: closestDateStoreData.remaining_budget_pct_change,
+      title: "Orders",
+      value: closestDateStoreData.orders_diff,
+      pctChange: closestDateStoreData.orders_pct_change,
     },
     {
       title: "Impressions",
@@ -96,11 +96,6 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
       title: "CPM",
       value: closestDateStoreData.CPM?.toFixed(1),
       pctChange: closestDateStoreData.CPM_pct_change,
-    },
-    {
-      title: "Pedidos GMO",
-      value: closestDateStoreData.pedidos_gmo?.toFixed(1),
-      pctChange: closestDateStoreData.pedidos_gmo_pct_change,
     },
   ];
 

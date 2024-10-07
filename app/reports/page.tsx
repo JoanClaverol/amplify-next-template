@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { debounce } from "lodash";
 import Box from "@cloudscape-design/components/box";
-import Spinner from "@cloudscape-design/components/spinner";
+import { Spinner, Header } from "@cloudscape-design/components";
 import { OrderChart } from "../components/OrderChart";
 import HeatMap from "../components/HeatMap";
 import SearchAndFilterBar from "../components/filters/SearchAndFilterDatesBar";
@@ -126,6 +126,7 @@ const Dashboard: React.FC = () => {
   return (
     <Box>
       <Box padding="l">
+        <Header variant="h1">Order history reports</Header>
         <SearchAndFilterBar
           selectedCompany={selectedCompany}
           isLoading={loading}

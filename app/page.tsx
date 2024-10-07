@@ -21,7 +21,7 @@ export default function Home() {
       header={
         <Header
           variant="h1"
-          description="To start, please select either Advertisign or Reports"
+          description="To start, please select either Advertising or Reports"
         >
           ThinkPaladar Dashboard
         </Header>
