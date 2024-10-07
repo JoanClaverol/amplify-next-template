@@ -16,7 +16,6 @@ const CardMetric: React.FC<CardMetricProps> = ({
   value,
   pctChange,
   currency,
-  color,
 }) => (
   <div
     style={{

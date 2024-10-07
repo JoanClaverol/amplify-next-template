@@ -21,25 +21,11 @@ export default function Home() {
       header={
         <Header
           variant="h1"
-          description="Search for a company and select date range to view advertising data"
+          description="To start, please select either Advertisign or Reports"
         >
-          Company Advertising Dashboard
+          ThinkPaladar Dashboard
         </Header>
       }
-    >
-      <Box>
-        <CompanySearchBar
-          selectedCompany={selectedCompany}
-          onSelect={setSelectedCompany}
-          isLoading={isLoading}
-        />
-        {selectedCompany && (
-          <AdvertisingComponent
-            selectedCompany={selectedCompany}
-            isLoading={isLoading}
-          />
-        )}
-      </Box>
-    </ContentLayout>
+    ></ContentLayout>
   );
 }

@@ -8,6 +8,7 @@ import CompanySearchBar from "../components/filters/CompanySearchBar";
 import StoreFilter from "../components/filters/StoreFilter";
 import AdvertisingCampaignFilter from "../components/filters/AdvertisingCampaignFilter";
 import AdvertisingSummary from "./AdvertisingSummary";
+import StoreAndCampaignSelect from "./StoreAndCampaignSelect";
 
 const AdvertisingPage = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
@@ -69,47 +70,17 @@ const AdvertisingPage = () => {
           onSelect={handleCompanySelect}
         />
       </Box>
-
-      <Box padding="l" textAlign="center">
-        {!selectedCompany && (
-          <h2>Please select a company to view the advertising data</h2>
-        )}
-        {loading && <Spinner size="large" />}
-        {error && (
-          <Alert type="error" header="Error fetching data">
-            {error.message}
-          </Alert>
-        )}
-        {selectedCompany && !loading && !error && storesData.length === 0 && (
-          <h2>No data available for the selected filters</h2>
-        )}
-        {selectedCompany && !loading && !error && storesData.length > 0 && (
-          <Grid
-            gridDefinition={[
-              { colspan: { default: 12, xxs: 4 } }, // Store filter
-              { colspan: { default: 12, xxs: 4 } }, // Campaign filter
-              { colspan: { default: 12, xxs: 4 } }, // Clear Store Selection button
-            ]}
-          >
-            <StoreFilter
-              selectedStore={selectedStore}
-              storeOptions={storeOptions}
-              handleStoreSelect={handleStoreSelect}
-            />
-            <AdvertisingCampaignFilter
-              selectedStartDate={selectedStartDate}
-              startDateOptions={startDateOptions}
-              handleStartDateSelect={handleStartDateSelect}
-            />
-            <Button
-              onClick={handleClearStoreSelection}
-              disabled={!selectedStore}
-            >
-              Clear Store Selection
-            </Button>
-          </Grid>
-        )}
-      </Box>
+      <StoreAndCampaignSelect
+        selectedCompany={selectedCompany}
+        loading={loading}
+        error={error}
+        storesData={storesData}
+        selectedStore={selectedStore}
+        selectedStartDate={selectedStartDate}
+        handleStoreSelect={handleStoreSelect}
+        handleStartDateSelect={handleStartDateSelect}
+        handleClearStoreSelection={handleClearStoreSelection}
+      />
 
       {selectedStore && selectedStartDate && (
         <Box padding="l" textAlign="center">
