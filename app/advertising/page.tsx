@@ -1,20 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Spinner,
-  Alert,
-  Grid,
-  Button,
-  Header,
-} from "@cloudscape-design/components";
+import { Header } from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
 import { useStoreData } from "../hooks/useAdvertisingData";
 import CompanySearchBar from "../components/filters/CompanySearchBar";
-import StoreFilter from "../components/filters/StoreFilter";
-import AdvertisingCampaignFilter from "../components/filters/AdvertisingCampaignFilter";
 import AdvertisingSummary from "./AdvertisingSummary";
 import StoreAndCampaignSelect from "./StoreAndCampaignSelect";
+import LineChartWithMetrics from "./LineChartMetrics";
 
 const AdvertisingPage = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
@@ -66,7 +59,6 @@ const AdvertisingPage = () => {
     label: startDate,
     value: startDate,
   }));
-
   return (
     <Box>
       <Box padding="l">
@@ -94,6 +86,11 @@ const AdvertisingPage = () => {
           <AdvertisingSummary
             storesData={storesData}
             selectedStore={selectedStore}
+          />
+          <LineChartWithMetrics
+          // storesData={storesData}
+          // selectedStore={selectedStore}
+          // selectedStartDate={selectedStartDate}
           />
         </Box>
       )}

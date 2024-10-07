@@ -97,6 +97,11 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
       value: closestDateStoreData.CPM?.toFixed(1),
       pctChange: closestDateStoreData.CPM_pct_change,
     },
+    {
+      title: "CPO",
+      value: closestDateStoreData.CPO?.toFixed(1),
+      pctChange: closestDateStoreData.CPO_pct_change,
+    },
   ];
 
   return (
