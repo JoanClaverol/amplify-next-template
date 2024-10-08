@@ -59,6 +59,7 @@ const AdvertisingPage = () => {
     label: startDate,
     value: startDate,
   }));
+
   return (
     <Box>
       <Box padding="l">
@@ -86,11 +87,12 @@ const AdvertisingPage = () => {
           <AdvertisingSummary
             storesData={storesData}
             selectedStore={selectedStore}
+            selectedStartDate={selectedStartDate}
           />
           <LineChartWithMetrics
-          // storesData={storesData}
-          // selectedStore={selectedStore}
-          // selectedStartDate={selectedStartDate}
+            storesData={storesData}
+            selectedStore={selectedStore}
+            selectedStartDate={selectedStartDate}
           />
         </Box>
       )}

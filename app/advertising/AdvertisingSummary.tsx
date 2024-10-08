@@ -9,21 +9,29 @@ import CardMetric from "./CardMetric"; // Import the CardMetric
 interface AdvertisingSummaryProps {
   storesData: StoreData[];
   selectedStore: string | null;
+  selectedStartDate: string | null;
 }
 
 const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
   storesData,
   selectedStore,
+  selectedStartDate,
 }) => {
+  // Find the closest date store data for the selected store and start date
   const closestDateStoreData: StoreData | null = useMemo(() => {
-    if (!selectedStore || storesData.length === 0) return null;
+    if (!selectedStore || !selectedStartDate || storesData.length === 0)
+      return null;
 
+    // Filter data by both store name and start date
     const filteredStores = storesData.filter(
-      (store) => store.store_name_scraped === selectedStore
+      (store) =>
+        store.store_name_scraped === selectedStore &&
+        store.start_date === selectedStartDate
     );
 
     if (filteredStores.length === 0) return null;
 
+    // Find the closest date within the filtered data
     const closestStore = filteredStores.reduce((prev, curr) => {
       return Math.abs(curr.date - Date.now()) < Math.abs(prev.date - Date.now())
         ? curr
@@ -31,7 +39,7 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
     });
 
     return closestStore;
-  }, [storesData, selectedStore]);
+  }, [storesData, selectedStore, selectedStartDate]);
 
   if (!closestDateStoreData) {
     return <p>No data available for the selected store</p>;
