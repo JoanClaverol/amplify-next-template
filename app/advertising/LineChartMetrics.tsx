@@ -145,26 +145,26 @@ const LineChartWithMetrics: React.FC<LineChartWithMetricsProps> = ({
           weekday: "short",
         })}`,
       yTickFormatter: (e: number) =>
-        e.toLocaleString(undefined, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-        }),
+        selectedMetric === "CR_GMO"
+          ? `${(e * 100).toFixed(2)}%`
+          : e.toLocaleString(undefined, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            }),
     },
     detailPopoverSeriesContent: ({ series, x, y }) => ({
       key: series.title,
-      value: y.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }),
+      value:
+        selectedMetric === "CR_GMO"
+          ? `${(y * 100).toFixed(2)}%`
+          : y.toLocaleString(undefined, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            }),
     }),
     yTitle: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-    // ariaLabel: "Metric Time Series Chart",
-    // height: 300,
-    // hideFilter: true,
-    // hideLegend: true,
-    // yTitle: selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1),
-    // statusType: "finished",
   };
+
   return (
     <Box>
       <Select

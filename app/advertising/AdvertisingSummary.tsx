@@ -82,7 +82,10 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
     },
     {
       title: "CR GMO",
-      value: closestDateStoreData.CR_GMO?.toFixed(1),
+      // value: closestDateStoreData.CR_GMO?.toFixed(1),
+      value: closestDateStoreData.CR_GMO
+        ? `${(closestDateStoreData.CR_GMO * 100).toFixed(2)}%`
+        : undefined,
       pctChange: closestDateStoreData.CR_GMO_pct_change,
     },
     {
