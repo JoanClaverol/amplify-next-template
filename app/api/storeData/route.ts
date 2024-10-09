@@ -14,12 +14,8 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Ensure the company name is properly encoded
-    const encodedCompanyName = encodeURIComponent(companyName.trim());
-
     // Build the URL with the encoded company name
-    const apiUrl = `${API_BASE_URL}/get-advertising-info?company_name=${encodedCompanyName}`;
+    const apiUrl = `${API_BASE_URL}/get-advertising-info?company_name=${companyName}`;
 
     // Fetch the data from the external API
     const response = await fetch(apiUrl);

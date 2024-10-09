@@ -268,14 +268,14 @@ const HeatMap: React.FC<HeatMapProps> = ({
     chart.selectAll(".domain").remove();
 
     // Add title
-    svg
-      .append("text")
-      .attr("x", width / 2 + margin.left)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "18px")
-      .style("font-weight", "bold")
-      .text(`${selectedMetric.replace(/_/g, " ")} Heatmap`);
+    // svg
+    //   .append("text")
+    //   .attr("x", width / 2 + margin.left)
+    //   .attr("y", 20)
+    //   .attr("text-anchor", "middle")
+    //   .style("font-size", "18px")
+    //   .style("font-weight", "bold")
+    //   .text(`${selectedMetric.replace(/_/g, " ")} Heatmap`);
   };
 
   return (
@@ -294,7 +294,7 @@ const HeatMap: React.FC<HeatMapProps> = ({
 // export default HeatMap;
 
 import { StoreData } from "../types/advertisingTypes";
-import { Select } from "@cloudscape-design/components";
+import { Box, Header, Select } from "@cloudscape-design/components";
 
 // Utility function to get the weekday from the timestamp
 const getWeekdayFromTimestamp = (timestamp: number) => {
@@ -376,8 +376,31 @@ const DataTransformer: React.FC<{
     { label: "Orders", value: "orders" },
   ];
 
+  // Return the maximum and the minimum date from the data
+  const minDate = new Date(
+    Math.min(...filteredData.map((data) => new Date(data.date).getTime()))
+  ).toLocaleDateString("en-US", {
+    weekday: "short", // Short weekday (e.g., Mon)
+    day: "numeric", // Day of the month (e.g., 1, 2)
+    month: "short", // Short month (e.g., Jan)
+  });
+
+  const maxDate = new Date(
+    Math.max(...filteredData.map((data) => new Date(data.date).getTime()))
+  ).toLocaleDateString("en-US", {
+    weekday: "short", // Short weekday (e.g., Mon)
+    day: "numeric", // Day of the month (e.g., 1, 2)
+    month: "short", // Short month (e.g., Jan)
+  });
+
+  console.log("minDate", minDate);
+  console.log("maxDate", maxDate);
+
   return (
-    <>
+    <Box>
+      <Header variant="h2">
+        Metric analysis from {minDate} to {maxDate}
+      </Header>
       <Select
         selectedOption={
           metricOptions.find((option) => option.value === selectedMetric) ||
@@ -389,9 +412,8 @@ const DataTransformer: React.FC<{
         options={metricOptions}
         placeholder="Choose a metric"
       />
-
       <HeatMap data={transformedData} selectedMetric={selectedMetric} />
-    </>
+    </Box>
   );
 };
 
