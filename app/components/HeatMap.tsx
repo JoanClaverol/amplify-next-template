@@ -12,7 +12,7 @@ interface DataPoint {
 
 interface HeatMapProps {
   data: DataPoint[];
-  currency: CurrencyCode;
+  currency?: CurrencyCode;
 }
 
 const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
@@ -55,7 +55,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
       hourMap.forEach((values, hour) => {
         newAggregatedData.push({
           order_weekday: weekday,
-          order_hour: +hour,
+          order_hour: hour,
           total_unique_orders: values.total_unique_orders,
           total_after_refund: values.total_after_refund,
         });
@@ -146,7 +146,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ data, currency }) => {
               0
             )}<br/>Average Total After Refund on the given period: ${formatCurrency(
               d.total_after_refund,
-              currency
+              currency || "EUR"
             )}`
           )
           .style("left", event.pageX + 10 + "px")

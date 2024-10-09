@@ -11,7 +11,7 @@ interface TransformedStoreData {
 }
 
 interface LineChartWithMetricsProps {
-  storesData: StoreData[];
+  dailyData: StoreData[];
   selectedStore: string | null;
   selectedStartDate: string | null;
 }
@@ -96,18 +96,14 @@ const transformDataToRawValues = (
 };
 
 const LineChartWithMetrics: React.FC<LineChartWithMetricsProps> = ({
-  storesData,
+  dailyData,
   selectedStore,
   selectedStartDate,
 }) => {
-  console.log(storesData);
-  console.log(selectedStore);
-  console.log(selectedStartDate);
-
   const [selectedMetric, setSelectedMetric] =
     useState<keyof StoreData>("gross_sales");
   // Filter data based on selected store and start date
-  const filteredData = storesData.filter(
+  const filteredData = dailyData.filter(
     (store) =>
       store.store_name_scraped === selectedStore &&
       store.start_date === selectedStartDate

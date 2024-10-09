@@ -1,49 +1,61 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { StoreData } from "../types/advertisingTypes";
 
-const API_URL =
-  "https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-advertising-info";
+const API_URL = "/api/storeData";
 
-export const useStoreData = (
+export const useAdvertisingData = (
   selectedCompany: string | null,
   selectedStore: string | null,
   selectedStartDate: string | null
 ) => {
-  const [storesData, setStoresData] = useState<StoreData[]>([]);
+  const [dailyData, setDailyData] = useState<StoreData[]>([]);
+  const [hourlyData, setHourlyData] = useState<StoreData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchData = useCallback(async (company: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        `${API_URL}?company_name=${encodeURIComponent(company)}`
-        // "http://localhost:8000/results"
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setStoresData(data);
-    } catch (error) {
-      setError(error as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (selectedCompany) {
-      fetchData(selectedCompany);
+    if (!selectedCompany) {
+      return;
     }
-  }, [selectedCompany, fetchData]);
 
-  const filteredData = useMemo(() => {
-    if (!selectedStore && !selectedStartDate) {
-      return storesData; // Return all data when no store or start date is selected
-    }
-    return storesData.filter((store) => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(
+          `${API_URL}?company_name=${encodeURIComponent(selectedCompany)}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const responseData = await response.json();
+
+        if (responseData.statusCode === 200) {
+          const dailyAnalysisData = responseData.data.daily_analysis || [];
+          const hourlyAnalysisData = responseData.data.hourly_analysis || [];
+
+          setDailyData(dailyAnalysisData);
+          setHourlyData(hourlyAnalysisData);
+        } else {
+          setDailyData([]);
+          setHourlyData([]);
+        }
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedCompany]);
+
+  // Filter daily and hourly data based on selected store and start date
+  const filterData = (data: StoreData[]) => {
+    return data.filter((store) => {
       if (selectedStore && store.store_name_scraped !== selectedStore) {
         return false;
       }
@@ -52,7 +64,15 @@ export const useStoreData = (
       }
       return true;
     });
-  }, [storesData, selectedStore, selectedStartDate]);
+  };
 
-  return { storesData: filteredData, loading, error };
+  const filteredDailyData = filterData(dailyData);
+  const filteredHourlyData = filterData(hourlyData);
+
+  return {
+    dailyData: filteredDailyData,
+    hourlyData: filteredHourlyData,
+    loading,
+    error,
+  };
 };

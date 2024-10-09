@@ -8,7 +8,7 @@ interface StoreAndCampaignSelectProps {
   selectedCompany: string | null;
   loading: boolean;
   error: any;
-  storesData: any[];
+  dailyData: any[];
   selectedStore: string | null;
   selectedStartDate: string | null;
   handleStoreSelect: (store: string | null) => void;
@@ -20,7 +20,7 @@ const StoreAndCampaignSelect: React.FC<StoreAndCampaignSelectProps> = ({
   selectedCompany,
   loading,
   error,
-  storesData,
+  dailyData,
   selectedStore,
   selectedStartDate,
   handleStoreSelect,
@@ -28,14 +28,14 @@ const StoreAndCampaignSelect: React.FC<StoreAndCampaignSelectProps> = ({
   handleClearStoreSelection,
 }) => {
   const storeOptions = Array.from(
-    new Set(storesData.map((store) => store.store_name_scraped))
+    new Set(dailyData.map((store) => store.store_name_scraped))
   ).map((storeName) => ({
     label: storeName,
     value: storeName,
   }));
 
   const startDateOptions = Array.from(
-    new Set(storesData.map((store) => store.start_date))
+    new Set(dailyData.map((store) => store.start_date))
   ).map((startDate) => ({
     label: startDate,
     value: startDate,
@@ -52,10 +52,10 @@ const StoreAndCampaignSelect: React.FC<StoreAndCampaignSelectProps> = ({
           {error.message}
         </Alert>
       )}
-      {selectedCompany && !loading && !error && storesData.length === 0 && (
+      {selectedCompany && !loading && !error && dailyData.length === 0 && (
         <h2>No data available for the selected filters</h2>
       )}
-      {selectedCompany && !loading && !error && storesData.length > 0 && (
+      {selectedCompany && !loading && !error && dailyData.length > 0 && (
         <Grid
           gridDefinition={[
             { colspan: { default: 12, xxs: 4 } },

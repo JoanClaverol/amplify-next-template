@@ -2,6 +2,7 @@ export interface StoreData {
   store_name_scraped: string;
   start_date: string;
   date: number;
+  hour?: number;
   status: string[];
   gross_sales: number;
   orders: number;

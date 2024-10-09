@@ -6,7 +6,7 @@ import { CurrencyCode } from "../types/currency";
 interface CardMetricProps {
   title: string;
   value: any;
-  pctChange: any;
+  pctChange?: any;
   currency?: string;
   color?: string;
 }

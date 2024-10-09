@@ -3,11 +3,13 @@
 import React, { useState } from "react";
 import { Header } from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
-import { useStoreData } from "../hooks/useAdvertisingData";
+import { useAdvertisingData } from "../hooks/useAdvertisingData";
 import CompanySearchBar from "../components/filters/CompanySearchBar";
 import AdvertisingSummary from "./AdvertisingSummary";
 import StoreAndCampaignSelect from "./StoreAndCampaignSelect";
 import LineChartWithMetrics from "./LineChartMetrics";
+// import HeatMapAdvertising from "./HeatMapAdvertising";
+import DataTransformer from "./HeatMapAdvertising";
 
 const AdvertisingPage = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
@@ -17,12 +19,11 @@ const AdvertisingPage = () => {
   );
 
   // Use custom hook to fetch data based on selected filters
-  const { storesData, loading, error } = useStoreData(
+  const { dailyData, hourlyData, loading, error } = useAdvertisingData(
     selectedCompany,
     selectedStore,
     selectedStartDate
   );
-
   // Handlers for store and date selection
   const handleStoreSelect = (store: string | null) => {
     setSelectedStore(store);
@@ -47,14 +48,14 @@ const AdvertisingPage = () => {
   };
 
   const storeOptions = Array.from(
-    new Set(storesData.map((store) => store.store_name_scraped))
+    new Set(dailyData.map((store) => store.store_name_scraped))
   ).map((storeName) => ({
     label: storeName,
     value: storeName,
   }));
 
   const startDateOptions = Array.from(
-    new Set(storesData.map((store) => store.start_date))
+    new Set(dailyData.map((store) => store.start_date))
   ).map((startDate) => ({
     label: startDate,
     value: startDate,
@@ -74,7 +75,7 @@ const AdvertisingPage = () => {
         selectedCompany={selectedCompany}
         loading={loading}
         error={error}
-        storesData={storesData}
+        dailyData={dailyData}
         selectedStore={selectedStore}
         selectedStartDate={selectedStartDate}
         handleStoreSelect={handleStoreSelect}
@@ -85,12 +86,17 @@ const AdvertisingPage = () => {
       {selectedStore && selectedStartDate && (
         <Box padding="l" textAlign="center">
           <AdvertisingSummary
-            storesData={storesData}
+            dailyData={dailyData}
             selectedStore={selectedStore}
             selectedStartDate={selectedStartDate}
           />
           <LineChartWithMetrics
-            storesData={storesData}
+            dailyData={dailyData}
+            selectedStore={selectedStore}
+            selectedStartDate={selectedStartDate}
+          />
+          <DataTransformer
+            hourlyData={hourlyData}
             selectedStore={selectedStore}
             selectedStartDate={selectedStartDate}
           />

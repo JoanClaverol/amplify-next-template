@@ -7,23 +7,24 @@ import { Header } from "@cloudscape-design/components";
 import CardMetric from "./CardMetric"; // Import the CardMetric
 
 interface AdvertisingSummaryProps {
-  storesData: StoreData[];
+  dailyData: StoreData[];
   selectedStore: string | null;
   selectedStartDate: string | null;
+  currency?: string;
 }
 
 const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
-  storesData,
+  dailyData,
   selectedStore,
   selectedStartDate,
 }) => {
   // Find the closest date store data for the selected store and start date
   const closestDateStoreData: StoreData | null = useMemo(() => {
-    if (!selectedStore || !selectedStartDate || storesData.length === 0)
+    if (!selectedStore || !selectedStartDate || dailyData.length === 0)
       return null;
 
     // Filter data by both store name and start date
-    const filteredStores = storesData.filter(
+    const filteredStores = dailyData.filter(
       (store) =>
         store.store_name_scraped === selectedStore &&
         store.start_date === selectedStartDate
@@ -39,7 +40,7 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
     });
 
     return closestStore;
-  }, [storesData, selectedStore, selectedStartDate]);
+  }, [dailyData, selectedStore, selectedStartDate]);
 
   if (!closestDateStoreData) {
     return <p>No data available for the selected store</p>;
@@ -47,8 +48,8 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
   const metrics = [
     {
       title: "Average daily budget",
-      value: closestDateStoreData.average_daily_budget || "N/A",
-      type: "currency",
+      value: closestDateStoreData?.average_daily_budget,
+      pctChange: null,
     },
     {
       title: "Remaining Budget",
@@ -57,7 +58,7 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
     },
     {
       title: "Gross Sales",
-      value: closestDateStoreData.gross_sales_diff,
+      value: closestDateStoreData.gross_sales_diff?.toFixed(2),
       pctChange: closestDateStoreData.gross_sales_pct_change,
     },
     {
@@ -77,15 +78,15 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
     },
     {
       title: "Total Spend",
-      value: closestDateStoreData.total_spend_diff,
+      value: closestDateStoreData.total_spend_diff?.toFixed(1),
       pctChange: closestDateStoreData.total_spend_pct_change,
     },
     {
       title: "CR GMO",
       // value: closestDateStoreData.CR_GMO?.toFixed(1),
       value: closestDateStoreData.CR_GMO
-        ? `${(closestDateStoreData.CR_GMO * 100).toFixed(2)}%`
-        : undefined,
+        ? (closestDateStoreData.CR_GMO * 100).toFixed(2) + "%"
+        : "N/A",
       pctChange: closestDateStoreData.CR_GMO_pct_change,
     },
     {
@@ -149,19 +150,13 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
       >
         {metrics.map((metric, index) => (
           <div key={index}>
-            {metric.type === "currency" ? (
-              <CardMetric
-                title={metric.title}
-                value={metric.value}
-                pctChange={null}
-              />
-            ) : (
+            {
               <CardMetric
                 title={metric.title}
                 value={metric.value}
                 pctChange={metric.pctChange}
               />
-            )}
+            }
           </div>
         ))}
       </div>
