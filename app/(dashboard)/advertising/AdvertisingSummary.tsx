@@ -1,8 +1,8 @@
 // AdvertisingSummary.tsx
 import React, { useMemo } from "react";
-import { CardContent } from "../components/CardContent";
+import { CardContent } from "../../components/CardContent";
 import Box from "@cloudscape-design/components/box";
-import { StoreData } from "../types/advertisingTypes";
+import { StoreData } from "../../types/advertisingTypes";
 import { Header } from "@cloudscape-design/components";
 import CardMetric from "./CardMetric"; // Import the CardMetric
 

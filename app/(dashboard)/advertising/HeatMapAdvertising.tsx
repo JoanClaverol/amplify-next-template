@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 // import { formatCurrency } from "../utils/formatCurrency"; // Adjust the import path as needed
-import { CurrencyCode } from "../types/currency"; // Adjust the import path as needed
+import { CurrencyCode } from "../../types/currency"; // Adjust the import path as needed
 
 interface DataPoint {
   order_weekday: string;
@@ -293,7 +293,7 @@ const HeatMap: React.FC<HeatMapProps> = ({
 
 // export default HeatMap;
 
-import { StoreData } from "../types/advertisingTypes";
+import { StoreData } from "../../types/advertisingTypes";
 import { Box, Header, Select } from "@cloudscape-design/components";
 
 // Utility function to get the weekday from the timestamp
@@ -392,9 +392,6 @@ const DataTransformer: React.FC<{
     day: "numeric", // Day of the month (e.g., 1, 2)
     month: "short", // Short month (e.g., Jan)
   });
-
-  console.log("minDate", minDate);
-  console.log("maxDate", maxDate);
 
   return (
     <Box>

@@ -3,13 +3,15 @@
 import React, { useState } from "react";
 import { Header } from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
-import { useAdvertisingData } from "../hooks/useAdvertisingData";
-import CompanySearchBar from "../components/filters/CompanySearchBar";
+import { useAdvertisingData } from "../../hooks/useAdvertisingData";
+import CompanySearchBar from "../../components/filters/CompanySearchBar";
 import AdvertisingSummary from "./AdvertisingSummary";
 import StoreAndCampaignSelect from "./StoreAndCampaignSelect";
 import LineChartWithMetrics from "./LineChartMetrics";
 // import HeatMapAdvertising from "./HeatMapAdvertising";
 import DataTransformer from "./HeatMapAdvertising";
+import CompanyAdvertisingHeatMap from "./CompanyAdvertisingHeatMap";
+import CompanyAdvertisingLineChart from "./PreviousPeriodComparisonLineChart";
 
 const AdvertisingPage = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
@@ -83,22 +85,33 @@ const AdvertisingPage = () => {
         handleClearStoreSelection={handleClearStoreSelection}
       />
 
-      {selectedStore && selectedStartDate && (
+      {selectedCompany && selectedStore && selectedStartDate && (
         <Box padding="l" textAlign="center">
           <AdvertisingSummary
             dailyData={dailyData}
             selectedStore={selectedStore}
             selectedStartDate={selectedStartDate}
           />
-          <LineChartWithMetrics
+          {/* <LineChartWithMetrics
             dailyData={dailyData}
             selectedStore={selectedStore}
             selectedStartDate={selectedStartDate}
+          /> */}
+          <CompanyAdvertisingLineChart
+            companyName={selectedCompany}
+            startDate="2024-10-07"
+            endDate="2024-10-13"
+            store={selectedStore}
+            campaignName={selectedStartDate}
+            metric="total_spend"
           />
-          <DataTransformer
-            hourlyData={hourlyData}
-            selectedStore={selectedStore}
-            selectedStartDate={selectedStartDate}
+          <CompanyAdvertisingHeatMap
+            companyName={selectedCompany}
+            startDate="2024-10-07"
+            endDate="2024-10-13"
+            store={selectedStore}
+            campaignName={selectedStartDate}
+            metric="total_spend"
           />
         </Box>
       )}

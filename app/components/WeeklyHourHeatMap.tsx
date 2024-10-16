@@ -1,14 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-
-interface DataPoint {
-  weekday: string;
-  hour: string;
-  value: number;
-}
+import { WeeklyHourHeatMapDataPoint } from "../types/heatMapDataPoint";
 
 interface HeatMapProps {
-  data: DataPoint[];
+  data: WeeklyHourHeatMapDataPoint[];
 }
 
 const WeeklyHourHeatMap: React.FC<HeatMapProps> = ({ data }) => {
@@ -69,11 +64,20 @@ const WeeklyHourHeatMap: React.FC<HeatMapProps> = ({ data }) => {
       "Saturday",
       "Sunday",
     ];
-    const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+
+    // Define the hours, with 0 (12 AM) placed after 23 (11 PM)
+    const hours = [
+      ...Array.from({ length: 24 }, (_, i) => i).filter((hour) => hour >= 7),
+      0,
+    ];
 
     // Scales
     const x = d3.scaleBand().range([0, width]).domain(weekdays).padding(0.01);
-    const y = d3.scaleBand().range([0, height]).domain(hours).padding(0.01);
+    const y = d3
+      .scaleBand()
+      .range([0, height])
+      .domain(hours.map(String))
+      .padding(0.01);
 
     const colorScale = d3
       .scaleSequential(d3.interpolateBlues)
@@ -92,14 +96,16 @@ const WeeklyHourHeatMap: React.FC<HeatMapProps> = ({ data }) => {
       .style("border-radius", "5px")
       .style("padding", "10px");
 
-    // Draw cells
+    // Filter out hours between 0:00 and 6:00, but include 0 (12 AM) separately
+    const filteredData = data.filter((d) => d.hour >= 7 || d.hour === 0);
+
     chart
       .selectAll()
-      .data(data)
+      .data(filteredData)
       .enter()
       .append("rect")
       .attr("x", (d) => x(d.weekday) || 0)
-      .attr("y", (d) => y(d.hour) || 0)
+      .attr("y", (d) => y(d.hour.toString()) || 0)
       .attr("width", x.bandwidth())
       .attr("height", y.bandwidth())
       .style("fill", (d) => colorScale(d.value))
@@ -107,7 +113,9 @@ const WeeklyHourHeatMap: React.FC<HeatMapProps> = ({ data }) => {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
-            `Weekday: ${d.weekday}<br/>Hour: ${d.hour}<br/>Value: ${d.value}`
+            `Weekday: ${d.weekday}<br/>Hour: ${
+              d.hour === 0 ? "12:00 AM" : `${d.hour}:00`
+            }<br/>Value: ${d.value}`
           )
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
@@ -132,7 +140,7 @@ const WeeklyHourHeatMap: React.FC<HeatMapProps> = ({ data }) => {
         d3
           .axisLeft(y)
           .tickSize(0)
-          .tickFormat((d) => d.toString())
+          .tickFormat((d) => (d === "0" ? "24:00" : `${d}:00`)) // Format the tick labels, 0 as 12:00 AM
       )
       .selectAll("text")
       .style("font-size", "12px");

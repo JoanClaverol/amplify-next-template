@@ -1,7 +1,7 @@
 import React from "react";
 import Box from "@cloudscape-design/components/box";
-import { CardContent } from "../components/CardContent";
-import { CurrencyCode } from "../types/currency";
+import { CardContent } from "../../components/CardContent";
+import { CurrencyCode } from "../../types/currency";
 
 interface CardMetricProps {
   title: string;

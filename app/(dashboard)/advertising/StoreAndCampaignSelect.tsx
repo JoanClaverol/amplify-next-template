@@ -1,8 +1,8 @@
 import React from "react";
 import { Grid, Spinner, Alert, Button } from "@cloudscape-design/components";
 import Box from "@cloudscape-design/components/box";
-import StoreFilter from "../components/filters/StoreFilter";
-import AdvertisingCampaignFilter from "../components/filters/AdvertisingCampaignFilter";
+import StoreFilter from "../../components/filters/StoreFilter";
+import AdvertisingCampaignFilter from "../../components/filters/AdvertisingCampaignFilter";
 
 interface StoreAndCampaignSelectProps {
   selectedCompany: string | null;

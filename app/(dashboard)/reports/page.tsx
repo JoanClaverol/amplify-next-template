@@ -2,12 +2,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Box from "@cloudscape-design/components/box";
 import { Spinner, Header } from "@cloudscape-design/components";
-import { OrderChart } from "../components/OrderChart";
-import HeatMap from "../components/HeatMap";
-import SearchAndFilterBar from "../components/filters/SearchAndFilterDatesBar";
-import { useWindowSize } from "../hooks/useWindowSize";
-import { OrderData } from "../types/orderTypes";
-import { SummaryCards } from "../components/OrdersSummaryCards";
+import { OrderChart } from "../../components/OrderChart";
+import HeatMap from "../../components/HeatMap";
+import SearchAndFilterBar from "../../components/filters/SearchAndFilterDatesBar";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { OrderData } from "../../types/orderTypes";
+import { SummaryCards } from "../../components/OrdersSummaryCards";
 
 // API function
 const fetchOrderData = async (
@@ -100,9 +100,9 @@ const Dashboard: React.FC = () => {
       <>
         <SummaryCards summary={orderData.summary} />
         {orderData.daily && <OrderChart data={orderData.daily} />}
-        {!isMobile && orderData.hourly && (
-          <HeatMap data={orderData.hourly} currency="EUR" />
-        )}
+        {/* {!isMobile && orderData.hourly && (
+          // <HeatMap data={orderData.hourly} currency="EUR" />
+        )} */}
       </>
     );
   };
