@@ -31,7 +31,7 @@ const fetchAndProcessLineChartData = async (
   campaignName: string,
   metric: string
 ): Promise<InputData[]> => {
-  const API_URL = `http://127.0.0.1:3000/get-advertising-metric-comparison?company_name=${encodeURIComponent(
+  const API_URL = `https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-advertising-metric-comparison?company_name=${encodeURIComponent(
     companyName
   )}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(
     endDate
