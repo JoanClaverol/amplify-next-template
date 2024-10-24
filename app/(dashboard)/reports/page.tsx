@@ -6,26 +6,31 @@ import { OrderChart } from "../../components/OrderChart";
 import HeatMap from "../../components/HeatMap";
 import SearchAndFilterBar from "../../components/filters/SearchAndFilterDatesBar";
 import { useWindowSize } from "../../hooks/useWindowSize";
+
+// Update the OrderData type
 import { OrderData } from "../../types/orderTypes";
 import { SummaryCards } from "../../components/OrdersSummaryCards";
+import { API_URL } from "app/constants/apiConfig";
+import CompanySearchBar from "app/components/filters/CompanySearchBar";
+import DateRangeSelector from "app/components/filters/DateRangePicker";
 
-// API function
+// Update the API function
 const fetchOrderData = async (
   companyName: string,
   startDate: string,
   endDate: string
 ): Promise<OrderData> => {
-  const response = await fetch(
-    `https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-order-history-info?company_name=${encodeURIComponent(
-      companyName
-    )}&start_date=${startDate}&end_date=${endDate}`
-  );
+  const url = `${API_URL}get-order-history-info?company_name=${encodeURIComponent(
+    companyName
+  )}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(
+    endDate
+  )}`;
+
+  console.log("Fetching data from:", url);
+  const response = await fetch(url);
+
   const data = await response.json();
-  return {
-    summary: data.result.order_summary,
-    daily: data.result.daily_order_summary,
-    hourly: data.result.hourly_order_summary,
-  };
+  return data;
 };
 
 const Dashboard: React.FC = () => {
@@ -81,6 +86,10 @@ const Dashboard: React.FC = () => {
     setEndDate(newEndDate);
   };
 
+  const handleCompanyChange = (newCompany: string) => {
+    setSelectedCompany(newCompany);
+  };
+
   const renderContent = () => {
     if (error) {
       return <h2>{error}</h2>;
@@ -98,11 +107,8 @@ const Dashboard: React.FC = () => {
     }
     return (
       <>
-        <SummaryCards summary={orderData.summary} />
-        {orderData.daily && <OrderChart data={orderData.daily} />}
-        {/* {!isMobile && orderData.hourly && (
-          // <HeatMap data={orderData.hourly} currency="EUR" />
-        )} */}
+        <SummaryCards summary={orderData} />
+        {/* Remove or update OrderChart and HeatMap components as they're no longer applicable */}
       </>
     );
   };
@@ -111,10 +117,11 @@ const Dashboard: React.FC = () => {
     <Box>
       <Box padding="l">
         <Header variant="h1">Order history reports</Header>
-        <SearchAndFilterBar
+        <CompanySearchBar
           selectedCompany={selectedCompany}
-          isLoading={loading}
-          onSelectCompany={setSelectedCompany}
+          onSelectCompany={handleCompanyChange}
+        />
+        <DateRangeSelector
           startDate={startDate}
           endDate={endDate}
           onDateRangeChange={handleDateRangeChange}

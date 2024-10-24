@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { StoreData } from "../types/advertisingTypes";
-
-const API_URL = "/api/storeData";
+import { API_URL } from "../constants/apiConfig";
 
 export const useAdvertisingData = (
   selectedCompany: string | null,
@@ -24,7 +23,9 @@ export const useAdvertisingData = (
 
       try {
         const response = await fetch(
-          `${API_URL}?company_name=${encodeURIComponent(selectedCompany)}`
+          `${API_URL}get-advertising-info?company_name=${encodeURIComponent(
+            selectedCompany
+          )}`
         );
 
         if (!response.ok) {
@@ -55,7 +56,7 @@ export const useAdvertisingData = (
 
   // Filter daily and hourly data based on selected store and start date
   const filterData = (data: StoreData[]) => {
-    return data.filter((store) => {
+    return data.filter((store: StoreData) => {
       if (selectedStore && store.store_name_scraped !== selectedStore) {
         return false;
       }

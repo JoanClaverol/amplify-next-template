@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 // import { formatCurrency } from "../utils/formatCurrency"; // Adjust the import path as needed
-import { CurrencyCode } from "../../types/currency"; // Adjust the import path as needed
+import { CurrencyCode } from "app/types/currency";
 
 interface DataPoint {
   order_weekday: string;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_BASE_URL } from "@/app/constants/apiConfig";
+import { API_URL } from "@/app/constants/apiConfig";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       );
     }
     // Build the URL with the encoded company name
-    const apiUrl = `${API_BASE_URL}/get-advertising-info?company_name=${companyName}`;
+    const apiUrl = `${API_URL}/get-advertising-info?company_name=${companyName}`;
 
     // Fetch the data from the external API
     const response = await fetch(apiUrl);

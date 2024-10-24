@@ -3,7 +3,7 @@ import LineChart from "@cloudscape-design/components/line-chart";
 import Box from "@cloudscape-design/components/box";
 import Select, { SelectProps } from "@cloudscape-design/components/select";
 import { LineChartProps } from "@cloudscape-design/components/line-chart";
-import { StoreData } from "../../types/advertisingTypes";
+import { StoreData } from "app/types/advertisingTypes";
 
 interface TransformedStoreData {
   x: Date;

@@ -7,8 +7,9 @@ import DateRangeSelector from "./DateRangePicker";
 
 interface SearchAndFilterDateRangeBarProps {
   selectedCompany: string | null;
+  selecredStore: string | null;
   isLoading: boolean;
-  onSelectCompany: (company: string | null) => void;
+  onSelectCompany: (company: string, store: string | null) => void;
   startDate: string | undefined;
   endDate: string | undefined;
   onDateRangeChange: (startDate: string, endDate: string) => void;
@@ -18,6 +19,7 @@ const SearchAndFilterDateRangeBar: React.FC<
   SearchAndFilterDateRangeBarProps
 > = ({
   selectedCompany,
+  selecredStore,
   isLoading,
   onSelectCompany,
   startDate,
@@ -34,6 +36,7 @@ const SearchAndFilterDateRangeBar: React.FC<
       <div style={{ width: "100%" }}>
         <CompanySearchBar
           selectedCompany={selectedCompany}
+          selectedStore={selecredStore}
           isLoading={isLoading}
           onSelect={onSelectCompany}
         />

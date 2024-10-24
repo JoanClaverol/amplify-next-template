@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import DateRangePicker from "@cloudscape-design/components/date-range-picker";
 
 interface DateRangeSelectorProps {
-  startDate?: string; // Expected format: 'DD/MM/YYYY'
-  endDate?: string; // Expected format: 'DD/MM/YYYY'
+  startDate?: string | null; // Expected format: 'YYYY-MM-DD'
+  endDate?: string | null; // Expected format: 'YYYY-MM-DD'
   onDateRangeChange?: (startDate: string, endDate: string) => void;
 }
 
@@ -14,17 +14,20 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
 }) => {
   const [dateRange, setDateRange] = useState<any>(undefined);
 
+  const formatDateToYYYYMMDD = (date: Date): string => {
+    return date.toISOString().split("T")[0];
+  };
+
+  const parseYYYYMMDD = (dateString: string): Date => {
+    return new Date(dateString);
+  };
+
   useEffect(() => {
     if (startDate && endDate) {
-      const formatDateForPicker = (dateString: string) => {
-        const [day, month, year] = dateString.split("/");
-        return `${year}-${month}-${day}`;
-      };
-
       setDateRange({
         type: "absolute",
-        startDate: formatDateForPicker(startDate),
-        endDate: formatDateForPicker(endDate),
+        startDate: startDate,
+        endDate: endDate,
       });
     }
   }, [startDate, endDate]);
@@ -32,16 +35,10 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   const handleChange = ({ detail }: any) => {
     setDateRange(detail.value);
     if (detail.value.type === "absolute") {
-      const formatDateForOutput = (dateString: string) => {
-        const date = new Date(dateString);
-        return `${date.getDate().toString().padStart(2, "0")}/${(
-          date.getMonth() + 1
-        )
-          .toString()
-          .padStart(2, "0")}/${date.getFullYear()}`;
-      };
-      const newStartDate = formatDateForOutput(detail.value.startDate);
-      const newEndDate = formatDateForOutput(detail.value.endDate);
+      const newStartDate = formatDateToYYYYMMDD(
+        new Date(detail.value.startDate)
+      );
+      const newEndDate = formatDateToYYYYMMDD(new Date(detail.value.endDate));
 
       if (onDateRangeChange) {
         onDateRangeChange(newStartDate, newEndDate);
@@ -62,7 +59,7 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     <DateRangePicker
       onChange={handleChange}
       value={dateRange}
-      placeholder="Select date range (DD/MM/YYYY)"
+      placeholder="Select date range (YYYY-MM-DD)"
       i18nStrings={{
         todayAriaLabel: "Today",
         nextMonthAriaLabel: "Next month",

@@ -1,10 +1,11 @@
 "use client";
 
-import WeeklyHourHeatMap from "@/app/components/WeeklyHourHeatMap";
+import WeeklyHourHeatMap from "app/components/WeeklyHourHeatMap";
 import { Box, Spinner } from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
-import { WeeklyHourHeatMapDataPoint } from "@/app/types/heatMapDataPoint";
-import { TotalSpentDataPoint } from "@/app/types/totalSpentDataPoint";
+import { WeeklyHourHeatMapDataPoint } from "app/types/heatMapDataPoint";
+import { TotalSpentDataPoint } from "app/types/totalSpentDataPoint";
+import { API_URL } from "app/constants/apiConfig";
 
 const weekdays = [
   "Monday",
@@ -19,21 +20,21 @@ const hours = Array.from({ length: 24 }, (_, i) => i);
 
 const fetchAndProcessData = async (
   companyName: string,
+  store: string,
   startDate: string,
   endDate: string,
-  store: string,
-  campaignName: string,
   metric: string
 ): Promise<WeeklyHourHeatMapDataPoint[]> => {
-  const API_URL = `https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/get-advertising-total-spent-hours?company_name=${encodeURIComponent(
+  const url = `${API_URL}get-advertising-total-spent-hours?company_name=${encodeURIComponent(
     companyName
-  )}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(
-    endDate
-  )}&store=${encodeURIComponent(store)}&campaign_start=${encodeURIComponent(
-    campaignName
-  )}&metric=${encodeURIComponent(metric)}`;
+  )}&store=${encodeURIComponent(store)}&start_date=${encodeURIComponent(
+    startDate
+  )}&end_date=${encodeURIComponent(endDate)}&metric=${encodeURIComponent(
+    metric
+  )}`;
+  console.log(url);
 
-  const response = await fetch(API_URL);
+  const response = await fetch(url);
   const data: TotalSpentDataPoint[] = await response.json();
 
   const dataMap = new Map(
@@ -51,19 +52,17 @@ const fetchAndProcessData = async (
 
 interface CompanyAdvertisingHeatMapProps {
   companyName: string;
+  store: string;
   startDate: string;
   endDate: string;
-  store: string;
-  campaignName: string;
   metric: string;
 }
 
 const CompanyAdvertisingHeatMap: React.FC<CompanyAdvertisingHeatMapProps> = ({
   companyName,
+  store,
   startDate,
   endDate,
-  store,
-  campaignName,
   metric,
 }) => {
   const [data, setData] = useState<WeeklyHourHeatMapDataPoint[]>([]);
@@ -72,19 +71,14 @@ const CompanyAdvertisingHeatMap: React.FC<CompanyAdvertisingHeatMapProps> = ({
     return;
   }
   useEffect(() => {
-    fetchAndProcessData(
-      companyName,
-      startDate,
-      endDate,
-      store,
-      campaignName,
-      metric
-    ).then(setData);
+    fetchAndProcessData(companyName, store, startDate, endDate, metric).then(
+      setData
+    );
   }, [companyName]);
 
   return (
     <Box padding="l" textAlign="center" variant="h2">
-      Evolución de la métrica por hora de {companyName}
+      Evolución del gasto por hora de {companyName}
       {data.length > 0 ? (
         <WeeklyHourHeatMap data={data} />
       ) : (

@@ -1,32 +1,43 @@
 import React, { useState, useEffect } from "react";
 import Autosuggest from "@cloudscape-design/components/autosuggest";
+import { API_URL } from "app/constants/apiConfig";
 
 interface Company {
   value: string;
+  stores: string[];
 }
 
 interface CompanySearchBarProps {
   selectedCompany: string | null;
-  isLoading: boolean;
   onSelect: (company: string) => void;
 }
 
-export default function CompanySearchBar({ selectedCompany, isLoading, onSelect }: CompanySearchBarProps) {
+export default function CompanySearchBar({
+  selectedCompany,
+  onSelect,
+}: CompanySearchBarProps) {
   const [inputValue, setInputValue] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCompanies() {
+      setIsLoading(true);
       try {
-        const response = await fetch('https://y3fglnw1n3.execute-api.eu-west-3.amazonaws.com/Prod/fetch-companies/');
-        if (!response.ok) {
+        const response = await fetch(`${API_URL}get-companies-and-stores`);
+        if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const data = await response.json();
-        const formattedCompanies = data.companies.map((company: string) => ({ value: company }));
-        setCompanies(formattedCompanies);
+        setCompanies(
+          Object.entries(data.data).map(([company, stores]) => ({
+            value: company,
+            stores: stores as string[],
+          }))
+        );
       } catch (error) {
-        console.error('Error fetching companies:', error);
+        console.error("Error fetching companies:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -34,24 +45,13 @@ export default function CompanySearchBar({ selectedCompany, isLoading, onSelect 
   }, []);
 
   useEffect(() => {
-    if (selectedCompany) {
-      setInputValue(selectedCompany);
-    }
+    if (selectedCompany) setInputValue(selectedCompany);
   }, [selectedCompany]);
-
-  const handleChange = ({ detail }: { detail: { value: string } }) => {
-    setInputValue(detail.value);
-  };
-
-  const handleSelect = ({ detail }: { detail: { value: string } }) => {
-    setInputValue(detail.value);
-    onSelect(detail.value);
-  };
 
   return (
     <Autosuggest
-      onChange={handleChange}
-      onSelect={handleSelect}
+      onChange={({ detail }) => setInputValue(detail.value)}
+      onSelect={({ detail }) => onSelect(detail.value)}
       value={inputValue}
       options={companies}
       ariaLabel="Company search"
