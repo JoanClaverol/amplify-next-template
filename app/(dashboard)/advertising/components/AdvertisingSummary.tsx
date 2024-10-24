@@ -17,7 +17,7 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
   selectedStore,
   selectedEndDate,
 }) => {
-  const [advertisingData, setAdvertisingData] = useState<StoreData | null>(
+  const [advertisingData, setAdvertisingData] = useState<StoreData[] | null>(
     null
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -43,8 +43,8 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
           throw new Error("Failed to fetch advertising data");
         }
 
-        const data = await response.json();
-        setAdvertisingData(data || []); // Assuming the API returns an array of store data
+        const data: StoreData[] = await response.json();
+        setAdvertisingData(data);
       } catch (err) {
         setError("Error fetching advertising data");
         console.error(err);
@@ -57,22 +57,28 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
   }, [selectedCompany, selectedStore, selectedEndDate]);
 
   const closestDateStoreData = useMemo(() => {
+    console.log("selectedEndDate", selectedEndDate);
+    console.log("advertisingData", advertisingData);
     if (!selectedEndDate || !advertisingData || advertisingData.length === 0)
       return null;
 
-    const targetDate = new Date(selectedEndDate).setHours(0, 0, 0, 0);
-    const filteredData = advertisingData.filter(
-      (data) => new Date(data.date).setHours(0, 0, 0, 0) === targetDate
+    const targetDate = new Date(selectedEndDate).getTime();
+
+    return advertisingData.reduce(
+      (closest: StoreData | null, current: StoreData) => {
+        const currentDate = new Date(current.date).getTime();
+
+        if (!closest) return current;
+
+        const closestDiff = Math.abs(
+          new Date(closest.date).getTime() - targetDate
+        );
+        const currentDiff = Math.abs(currentDate - targetDate);
+
+        return currentDiff < closestDiff ? current : closest;
+      },
+      null
     );
-
-    if (filteredData.length === 0) return null;
-
-    return filteredData.reduce((prev, curr) => {
-      return Math.abs(new Date(curr.date).getTime() - Date.now()) <
-        Math.abs(new Date(prev.date).getTime() - Date.now())
-        ? curr
-        : prev;
-    });
   }, [advertisingData, selectedEndDate]);
 
   if (isLoading) {

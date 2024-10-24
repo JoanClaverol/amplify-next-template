@@ -293,7 +293,7 @@ const HeatMap: React.FC<HeatMapProps> = ({
 
 // export default HeatMap;
 
-import { StoreData } from "../../types/advertisingTypes";
+import { StoreData } from "app/types/advertisingTypes";
 import { Box, Header, Select } from "@cloudscape-design/components";
 
 // Utility function to get the weekday from the timestamp

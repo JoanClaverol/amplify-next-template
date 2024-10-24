@@ -7,15 +7,15 @@ interface Company {
   stores: string[];
 }
 
-interface CompanySearchBarProps {
+export interface CompanySearchBarProps {
   selectedCompany: string | null;
   onSelect: (company: string) => void;
 }
 
-export default function CompanySearchBar({
+const CompanySearchBar: React.FC<CompanySearchBarProps> = ({
   selectedCompany,
   onSelect,
-}: CompanySearchBarProps) {
+}) => {
   const [inputValue, setInputValue] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,4 +62,6 @@ export default function CompanySearchBar({
       enteredTextLabel={(value) => `Use: "${value}"`}
     />
   );
-}
+};
+
+export default CompanySearchBar;

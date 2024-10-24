@@ -2,17 +2,34 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Box from "@cloudscape-design/components/box";
 import { Spinner, Header } from "@cloudscape-design/components";
-import { OrderChart } from "../../components/OrderChart";
-import HeatMap from "../../components/HeatMap";
-import SearchAndFilterBar from "../../components/filters/SearchAndFilterDatesBar";
 import { useWindowSize } from "../../hooks/useWindowSize";
 
 // Update the OrderData type
-import { OrderData } from "../../types/orderTypes";
 import { SummaryCards } from "../../components/OrdersSummaryCards";
 import { API_URL } from "app/constants/apiConfig";
 import CompanySearchBar from "app/components/filters/CompanySearchBar";
+
 import DateRangeSelector from "app/components/filters/DateRangePicker";
+
+// Update the OrderData type
+// Update the OrderData interface
+interface OrderData {
+  "Unique Orders": number;
+  "Average Ticket": number;
+  "Total Refund Amount": number;
+  Reimbursements: number;
+  "Number of Orders with Promotions": number;
+  "Spending in Promotions": number;
+  "Sells in Promotions": number;
+  "Effort Rate": number;
+  "ROAS in Promotions": number;
+}
+
+// Update the CompanySearchBar component import or definition to include the onSelectCompany prop
+interface CompanySearchBarProps {
+  selectedCompany: string | null;
+  onSelectCompany: (newCompany: string) => void;
+}
 
 // Update the API function
 const fetchOrderData = async (
@@ -119,7 +136,7 @@ const Dashboard: React.FC = () => {
         <Header variant="h1">Order history reports</Header>
         <CompanySearchBar
           selectedCompany={selectedCompany}
-          onSelectCompany={handleCompanyChange}
+          onSelect={handleCompanyChange} // Change this line
         />
         <DateRangeSelector
           startDate={startDate}

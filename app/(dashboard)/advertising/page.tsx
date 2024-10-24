@@ -10,6 +10,8 @@ import CompanySearchBar from "app/components/filters/CompanySearchBar";
 import StoreSelector from "app/components/filters/StoreSelector";
 import DateRangeSelector from "app/components/filters/DateRangePicker";
 
+import { CompanySearchBarProps } from "app/components/filters/CompanySearchBar";
+
 const AdvertisingPage = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
