@@ -57,8 +57,6 @@ const AdvertisingSummary: React.FC<AdvertisingSummaryProps> = ({
   }, [selectedCompany, selectedStore, selectedEndDate]);
 
   const closestDateStoreData = useMemo(() => {
-    console.log("selectedEndDate", selectedEndDate);
-    console.log("advertisingData", advertisingData);
     if (!selectedEndDate || !advertisingData || advertisingData.length === 0)
       return null;
 

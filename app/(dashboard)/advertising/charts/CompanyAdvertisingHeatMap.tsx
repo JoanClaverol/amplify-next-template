@@ -32,7 +32,6 @@ const fetchAndProcessData = async (
   )}&end_date=${encodeURIComponent(endDate)}&metric=${encodeURIComponent(
     metric
   )}`;
-  console.log(url);
 
   const response = await fetch(url);
   const data: TotalSpentDataPoint[] = await response.json();

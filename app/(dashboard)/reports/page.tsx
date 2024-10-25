@@ -43,7 +43,6 @@ const fetchOrderData = async (
     endDate
   )}`;
 
-  console.log("Fetching data from:", url);
   const response = await fetch(url);
 
   const data = await response.json();
